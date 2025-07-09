@@ -151,8 +151,8 @@ export default function EditMenuItemPage() {
     } catch (error: any) {
       console.error('Güncelleme hatası: ', error);
       let description = 'Ürün güncellenirken bir hata oluştu.';
-      if (error.message.includes('Cloudinary')) {
-        description = 'Resim yüklenemedi. Lütfen Cloudinary ayarlarınızı kontrol edin.';
+      if (error.message.includes('Cloudinary') || error.message.includes('Resim')) {
+        description = 'Resim yüklenemedi. Lütfen Cloudinary ayarlarınızı (.env dosyası) kontrol edin.';
       } else if (error.code === 'permission-denied') {
         description =
           'Veritabanına yazma izniniz yok. Lütfen Firebase kurallarınızı kontrol edin.';
