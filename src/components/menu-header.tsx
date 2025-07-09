@@ -14,6 +14,7 @@ export function MenuHeader() {
           fill
           className="object-cover"
           data-ai-hint="cafe interior"
+          priority
         />
         <div className="absolute inset-0 bg-black/50" />
       </div>

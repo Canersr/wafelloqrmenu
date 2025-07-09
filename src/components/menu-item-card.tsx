@@ -8,17 +8,35 @@ interface MenuItemCardProps {
   item: MenuItem;
 }
 
+const getOptimizedCloudinaryUrl = (url: string) => {
+  if (!url || !url.includes('res.cloudinary.com/')) {
+    return url;
+  }
+  
+  const parts = url.split('/upload/');
+  if (parts.length !== 2) {
+    return url;
+  }
+  
+  const transformations = 'w_400,c_fill,q_auto,f_auto';
+  
+  return `${parts[0]}/upload/${transformations}/${parts[1]}`;
+};
+
 export function MenuItemCard({ item }: MenuItemCardProps) {
   const hint = item.aiHint ?? item.name.split(' ').slice(0, 2).join(' ').toLowerCase();
+  const optimizedImageUrl = getOptimizedCloudinaryUrl(item.imageUrl);
+
   return (
     <Card className="overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 flex flex-col h-full bg-card border-none rounded-xl">
       <CardHeader className="p-0 relative h-48">
         <Image
-          src={item.imageUrl}
+          src={optimizedImageUrl}
           alt={item.name}
           fill
           className="object-cover rounded-t-xl"
           data-ai-hint={hint}
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
         />
       </CardHeader>
       <CardContent className="p-4 flex-grow flex flex-col bg-white">

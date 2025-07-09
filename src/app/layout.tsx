@@ -3,7 +3,12 @@ import { Fredoka } from 'next/font/google';
 import { Toaster } from "@/components/ui/toaster"
 import './globals.css';
 
-const fredoka = Fredoka({ subsets: ['latin'], variable: '--font-fredoka' });
+const fredoka = Fredoka({ 
+  subsets: ['latin'], 
+  weight: ['400', '500', '600', '700'],
+  display: 'swap',
+  variable: '--font-fredoka' 
+});
 
 export const metadata: Metadata = {
   title: 'Wafello - The Art of Waffles',
@@ -17,11 +22,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet" />
-      </head>
+      <head />
       <body className={`${fredoka.variable} font-body antialiased`}>
         {children}
         <Toaster />
