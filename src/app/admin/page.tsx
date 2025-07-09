@@ -55,7 +55,7 @@ export default function AdminDashboard() {
       console.error("Veri çekme hatası: ", error);
       toast({
         title: "Veritabanı Hatası",
-        description: "Ürünler çekilirken bir hata oluştu. Lütfen Firebase yapılandırmanızı kontrol edin.",
+        description: "Ürünler çekilirken bir hata oluştu. Lütfen Firebase yapılandırmanızı ve güvenlik kurallarınızı kontrol edin.",
         variant: "destructive"
       });
       setLoading(false);
@@ -119,7 +119,7 @@ export default function AdminDashboard() {
               ) : menuItems.length === 0 ? (
                  <TableRow>
                   <TableCell colSpan={4} className="text-center h-24 text-muted-foreground">
-                    Henüz ürün eklenmemiş. "Yeni Ürün Ekle" butonu ile başlayın.
+                    Veritabanında hiç ürün bulunamadı. Başlamak için "Yeni Ürün Ekle" butonuna tıklayın.
                   </TableCell>
                 </TableRow>
               ) : (
