@@ -9,7 +9,7 @@ export function MenuHeader() {
     <header className="relative h-48 md:h-56 w-full text-foreground">
       <div className="absolute inset-0">
         <Image
-          src="https://placehold.co/1200x400/A1887F/FFFFFF.png"
+          src="https://placehold.co/1200x400.png"
           alt="Wafello cafe interior"
           fill
           className="object-cover"
