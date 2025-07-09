@@ -4,6 +4,9 @@ import { useParams, useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
+import type { MenuItem } from '@/types';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -30,8 +33,10 @@ import {
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { menuItems } from '@/lib/data';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { Loader2 } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
+
 
 const categories = [
   'Klasik Waffle',
@@ -42,7 +47,7 @@ const categories = [
 
 const formSchema = z.object({
   name: z.string().min(2, 'İsim en az 2 karakter olmalıdır.'),
-  category: z.string({ required_error: 'Lütfen bir kategori seçin.' }),
+  category: z.enum([...categories] as [string, ...string[]], { required_error: 'Lütfen bir kategori seçin.' }),
   description: z.string().min(10, 'Açıklama en az 10 karakter olmalıdır.'),
   price: z.coerce.number().positive('Fiyat pozitif bir sayı olmalıdır.'),
 });
@@ -51,51 +56,97 @@ export default function EditMenuItemPage() {
   const router = useRouter();
   const params = useParams();
   const { toast } = useToast();
-  const itemId = parseInt(params.id as string, 10);
-  const item = menuItems.find((i) => i.id === itemId);
+  const itemId = params.id as string;
+  const [loading, setLoading] = useState(false);
+  const [fetching, setFetching] = useState(true);
+  const [item, setItem] = useState<MenuItem | null>(null);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: item || {
-      name: '',
-      description: '',
-      price: 0,
-    },
   });
 
   useEffect(() => {
-    if (item) {
-      form.reset(item);
-    }
-  }, [item, form]);
+    if (!itemId) return;
+    
+    const fetchItem = async () => {
+      setFetching(true);
+      const docRef = doc(db, "menuItems", itemId);
+      const docSnap = await getDoc(docRef);
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log({ ...values, id: itemId });
-    toast({
-      title: 'Demo Modu',
-      description:
-        'Ürün güncellendi (simülasyon). Bu özellik için bir veritabanı bağlantısı gerekir.',
-      variant: 'default',
-    });
-    router.push('/admin');
+      if (docSnap.exists()) {
+        const data = docSnap.data() as Omit<MenuItem, 'id'>;
+        setItem({ id: docSnap.id, ...data });
+        form.reset(data);
+      } else {
+        toast({
+          title: "Hata",
+          description: "Ürün bulunamadı.",
+          variant: "destructive"
+        });
+        router.push('/admin');
+      }
+      setFetching(false);
+    };
+
+    fetchItem();
+  }, [itemId, form, router, toast]);
+
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    if (!itemId) return;
+    setLoading(true);
+    try {
+      const docRef = doc(db, 'menuItems', itemId);
+      await updateDoc(docRef, values);
+      toast({
+        title: 'Başarılı!',
+        description: 'Ürün başarıyla güncellendi.',
+        variant: 'default',
+      });
+      router.push('/admin');
+    } catch (error) {
+      console.error("Güncelleme hatası: ", error);
+      toast({
+        title: 'Hata!',
+        description: 'Ürün güncellenirken bir hata oluştu.',
+        variant: 'destructive',
+      });
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  if (fetching) {
+    return (
+       <Card>
+        <CardHeader>
+          <Skeleton className="h-8 w-1/2" />
+          <Skeleton className="h-4 w-1/3" />
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div className="space-y-2">
+            <Skeleton className="h-4 w-1/4" />
+            <Skeleton className="h-10 w-full" />
+          </div>
+          <div className="space-y-2">
+            <Skeleton className="h-4 w-1/4" />
+            <Skeleton className="h-10 w-full" />
+          </div>
+          <div className="space-y-2">
+            <Skeleton className="h-4 w-1/4" />
+            <Skeleton className="h-20 w-full" />
+          </div>
+          <div className="space-y-2">
+            <Skeleton className="h-4 w-1/4" />
+            <Skeleton className="h-10 w-full" />
+          </div>
+        </CardContent>
+      </Card>
+    );
   }
 
   if (!item) {
-    return (
-      <div className="flex justify-center items-center h-full">
-        <Card>
-          <CardHeader>
-            <CardTitle>Hata</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p>Ürün bulunamadı. Lütfen yönetim paneline geri dönün.</p>
-            <Button onClick={() => router.push('/admin')} className="mt-4">
-              Geri Dön
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
-    );
+    // This case is handled by the useEffect redirect, but as a fallback.
+    return <p>Ürün yüklenemedi.</p>;
   }
 
   return (
@@ -183,10 +234,14 @@ export default function EditMenuItemPage() {
                 type="button"
                 variant="outline"
                 onClick={() => router.back()}
+                disabled={loading}
               >
                 İptal
               </Button>
-              <Button type="submit">Güncelle</Button>
+              <Button type="submit" disabled={loading}>
+                {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Güncelle
+              </Button>
             </div>
           </form>
         </Form>

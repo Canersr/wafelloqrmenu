@@ -1,6 +1,10 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { collection, onSnapshot, doc, deleteDoc, query, orderBy } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
+import type { MenuItem } from '@/types';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -17,8 +21,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { menuItems } from '@/lib/data';
-import { PlusCircle, Edit, Trash2 } from 'lucide-react';
+import { PlusCircle, Edit, Trash2, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import {
   AlertDialog,
@@ -34,13 +37,41 @@ import {
 
 export default function AdminDashboard() {
   const { toast } = useToast();
+  const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const handleDelete = (itemName: string) => {
-    toast({
-      title: `Demo Modu`,
-      description: `${itemName} silindi (simülasyon). Bu özellik için bir veritabanı gerekir.`,
-      variant: 'destructive',
+  useEffect(() => {
+    const menuItemsCollection = collection(db, 'menuItems');
+    const q = query(menuItemsCollection, orderBy('name'));
+    
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const items = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      })) as MenuItem[];
+      setMenuItems(items);
+      setLoading(false);
     });
+
+    return () => unsubscribe();
+  }, []);
+
+  const handleDelete = async (item: MenuItem) => {
+    try {
+      await deleteDoc(doc(db, 'menuItems', item.id));
+      toast({
+        title: 'Başarılı!',
+        description: `"${item.name}" adlı ürün başarıyla silindi.`,
+        variant: 'default',
+      });
+    } catch (error) {
+      console.error("Silme hatası: ", error);
+      toast({
+        title: 'Hata!',
+        description: 'Ürün silinirken bir hata oluştu.',
+        variant: 'destructive',
+      });
+    }
   };
 
   return (
@@ -71,55 +102,69 @@ export default function AdminDashboard() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {menuItems.map((item) => (
-                <TableRow key={item.id}>
-                  <TableCell className="font-medium">{item.name}</TableCell>
-                  <TableCell className="hidden md:table-cell">
-                    {item.category}
-                  </TableCell>
-                  <TableCell className="hidden sm:table-cell">
-                    {item.price.toFixed(2)} TL
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <Button variant="ghost" size="icon" asChild>
-                      <Link href={`/admin/edit/${item.id}`} title="Düzenle">
-                        <Edit className="h-4 w-4" />
-                      </Link>
-                    </Button>
-
-                    <AlertDialog>
-                      <AlertDialogTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="text-red-500 hover:text-red-700"
-                          title="Sil"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent>
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>Emin misiniz?</AlertDialogTitle>
-                          <AlertDialogDescription>
-                            "{item.name}" ürününü silmek üzeresiniz. Bu işlem
-                            geri alınamaz.
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel>İptal</AlertDialogCancel>
-                          <AlertDialogAction
-                            onClick={() => handleDelete(item.name)}
-                            className="bg-destructive hover:bg-destructive/90"
-                          >
-                            Sil
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
+              {loading ? (
+                <TableRow>
+                  <TableCell colSpan={4} className="text-center h-24">
+                    <Loader2 className="h-6 w-6 animate-spin inline-block" />
                   </TableCell>
                 </TableRow>
-              ))}
+              ) : menuItems.length === 0 ? (
+                 <TableRow>
+                  <TableCell colSpan={4} className="text-center h-24 text-muted-foreground">
+                    Henüz ürün eklenmemiş.
+                  </TableCell>
+                </TableRow>
+              ) : (
+                menuItems.map((item) => (
+                  <TableRow key={item.id}>
+                    <TableCell className="font-medium">{item.name}</TableCell>
+                    <TableCell className="hidden md:table-cell">
+                      {item.category}
+                    </TableCell>
+                    <TableCell className="hidden sm:table-cell">
+                      {item.price.toFixed(2)} TL
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <Button variant="ghost" size="icon" asChild>
+                        <Link href={`/admin/edit/${item.id}`} title="Düzenle">
+                          <Edit className="h-4 w-4" />
+                        </Link>
+                      </Button>
+
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="text-red-500 hover:text-red-700"
+                            title="Sil"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Emin misiniz?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              "{item.name}" ürününü silmek üzeresiniz. Bu işlem
+                              geri alınamaz.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>İptal</AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={() => handleDelete(item)}
+                              className="bg-destructive hover:bg-destructive/90"
+                            >
+                              Sil
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
             </TableBody>
           </Table>
         </div>

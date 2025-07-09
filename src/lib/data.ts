@@ -1,9 +1,11 @@
 import type { MenuItem } from '@/types';
 
-export const menuItems: MenuItem[] = [
+// Bu dosya artık doğrudan kullanılmıyor.
+// Veriler Firebase Firestore'dan çekilmektedir.
+// Bu veriyi, veritabanınızı ilk kez doldurmak için referans olarak kullanabilirsiniz.
+export const menuItems: Omit<MenuItem, 'id'>[] = [
   // Klasik Waffle
   {
-    id: 1,
     category: 'Klasik Waffle',
     name: 'Belçika Usulü',
     description: 'Pudra şekeri ve akçaağaç şurubu ile servis edilen klasik Belçika waffle.',
@@ -13,7 +15,6 @@ export const menuItems: MenuItem[] = [
   },
   // Meyveli Waffle
   {
-    id: 2,
     category: 'Meyveli Waffle',
     name: 'Beyaz Büyü',
     description: 'Beyaz çikolata, Hindistan cevizi, badem ve muz dilimleri.',
@@ -22,7 +23,6 @@ export const menuItems: MenuItem[] = [
     aiHint: 'white chocolate',
   },
   {
-    id: 3,
     category: 'Meyveli Waffle',
     name: 'Çilekli Rüyası',
     description: 'Taze çilekler, cheesecake kreması ve bisküvi kırıntıları.',
@@ -32,7 +32,6 @@ export const menuItems: MenuItem[] = [
   },
   // Çikolatalı Lezzetler
   {
-    id: 4,
     category: 'Çikolatalı Lezzetler',
     name: 'Çikolata Şelalesi',
     description: 'Bol Nutella, beyaz çikolata sosu, fındık ve çikolata parçacıkları.',
@@ -41,7 +40,6 @@ export const menuItems: MenuItem[] = [
     aiHint: 'chocolate waffle',
   },
   {
-    id: 5,
     category: 'Çikolatalı Lezzetler',
     name: 'Oreo Canavarı',
     description: 'Oreo parçacıkları, beyaz çikolata sosu ve vanilyalı dondurma.',
@@ -50,7 +48,6 @@ export const menuItems: MenuItem[] = [
     aiHint: 'oreo waffle',
   },
   {
-    id: 6,
     category: 'Çikolatalı Lezzetler',
     name: 'Lotus Biscoff Keyfi',
     description: 'Lotus Biscoff kreması, kırılmış Lotus bisküvileri ve bir top vanilyalı dondurma.',
@@ -60,7 +57,6 @@ export const menuItems: MenuItem[] = [
   },
   // İçecekler
   {
-    id: 7,
     category: 'İçecekler',
     name: 'Ev Yapımı Limonata',
     description: 'Taze sıkılmış, ferahlatıcı limonata.',
@@ -69,7 +65,6 @@ export const menuItems: MenuItem[] = [
     aiHint: 'lemonade glass',
   },
   {
-    id: 8,
     category: 'İçecekler',
     name: 'Latte',
     description: 'Espresso ve buharda ısıtılmış sütün mükemmel uyumu.',
@@ -78,7 +73,6 @@ export const menuItems: MenuItem[] = [
     aiHint: 'latte art',
   },
   {
-    id: 9,
     category: 'İçecekler',
     name: 'Sıcak Çikolata',
     description: 'Yoğun ve kremalı sıcak çikolata.',
@@ -87,7 +81,6 @@ export const menuItems: MenuItem[] = [
     aiHint: 'hot chocolate',
   },
   {
-    id: 10,
     category: 'İçecekler',
     name: 'Filtre Kahve',
     description: 'Taze demlenmiş, aromatik filtre kahve.',

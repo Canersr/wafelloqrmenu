@@ -4,6 +4,8 @@ import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { collection, addDoc } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -30,7 +32,8 @@ import {
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { menuItems } from '@/lib/data';
+import { Loader2 } from 'lucide-react';
+import { useState } from 'react';
 
 const categories = [
   'Klasik Waffle',
@@ -41,7 +44,10 @@ const categories = [
 
 const formSchema = z.object({
   name: z.string().min(2, 'İsim en az 2 karakter olmalıdır.'),
-  category: z.string({ required_error: 'Lütfen bir kategori seçin.' }),
+  category: z.enum(
+    [...categories] as [string, ...string[]],
+    { required_error: 'Lütfen bir kategori seçin.' }
+  ),
   description: z.string().min(10, 'Açıklama en az 10 karakter olmalıdır.'),
   price: z.coerce.number().positive('Fiyat pozitif bir sayı olmalıdır.'),
 });
@@ -49,6 +55,7 @@ const formSchema = z.object({
 export default function AddMenuItemPage() {
   const router = useRouter();
   const { toast } = useToast();
+  const [loading, setLoading] = useState(false);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -58,15 +65,29 @@ export default function AddMenuItemPage() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
-    toast({
-      title: 'Demo Modu',
-      description:
-        'Yeni ürün eklendi (simülasyon). Bu özellik için bir veritabanı bağlantısı gerekir.',
-      variant: 'default',
-    });
-    router.push('/admin');
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    setLoading(true);
+    try {
+      await addDoc(collection(db, 'menuItems'), {
+        ...values,
+        imageUrl: `https://placehold.co/600x400.png`,
+        aiHint: values.name.split(' ').slice(0, 2).join(' ').toLowerCase(),
+      });
+      toast({
+        title: 'Başarılı!',
+        description: 'Yeni ürün menüye başarıyla eklendi.',
+        variant: 'default',
+      });
+      router.push('/admin');
+    } catch (error) {
+      console.error("Ekleme hatası: ", error);
+      toast({
+        title: 'Hata!',
+        description: 'Ürün eklenirken bir hata oluştu.',
+        variant: 'destructive',
+      });
+      setLoading(false);
+    }
   }
 
   return (
@@ -152,10 +173,14 @@ export default function AddMenuItemPage() {
                 type="button"
                 variant="outline"
                 onClick={() => router.back()}
+                disabled={loading}
               >
                 İptal
               </Button>
-              <Button type="submit">Kaydet</Button>
+              <Button type="submit" disabled={loading}>
+                {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Kaydet
+              </Button>
             </div>
           </form>
         </Form>
