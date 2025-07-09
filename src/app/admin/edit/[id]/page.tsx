@@ -36,6 +36,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useEffect, useState } from 'react';
 import { Loader2 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
+import Image from 'next/image';
 
 const categories = [
   'Klasik Waffle',
@@ -61,6 +62,8 @@ export default function EditMenuItemPage() {
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(true);
   const [item, setItem] = useState<MenuItem | null>(null);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -79,6 +82,9 @@ export default function EditMenuItemPage() {
           const data = docSnap.data() as Omit<MenuItem, 'id'>;
           setItem({ id: docSnap.id, ...data });
           form.reset(data);
+          if (data.imageUrl) {
+            setImagePreview(data.imageUrl);
+          }
         } else {
           toast({
             title: 'Hata',
@@ -102,12 +108,40 @@ export default function EditMenuItemPage() {
     fetchItem();
   }, [itemId, form, router, toast]);
 
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setImageFile(file);
+      setImagePreview(URL.createObjectURL(file));
+    }
+  };
+  
   async function onSubmit(values: z.infer<typeof formSchema>) {
     if (!itemId || !item) return;
     setLoading(true);
+    let imageUrl = item.imageUrl;
+
     try {
+      if (imageFile) {
+        const formData = new FormData();
+        formData.append('file', imageFile);
+        formData.append('upload_preset', process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET!);
+        
+        const res = await fetch(`https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`, {
+            method: 'POST',
+            body: formData,
+        });
+        
+        if (!res.ok) {
+            throw new Error('Resim yüklemesi başarısız oldu.');
+        }
+        
+        const data = await res.json();
+        imageUrl = data.secure_url;
+      }
+
       const docRef = doc(db, 'menuItems', itemId);
-      await updateDoc(docRef, { ...values, imageUrl: item.imageUrl });
+      await updateDoc(docRef, { ...values, imageUrl: imageUrl });
       toast({
         title: 'Başarılı!',
         description: 'Ürün başarıyla güncellendi.',
@@ -117,9 +151,11 @@ export default function EditMenuItemPage() {
     } catch (error: any) {
       console.error('Güncelleme hatası: ', error);
       let description = 'Ürün güncellenirken bir hata oluştu.';
-      if (error.code === 'permission-denied') {
+      if (error.message.includes('Cloudinary')) {
+        description = 'Resim yüklenemedi. Lütfen Cloudinary ayarlarınızı kontrol edin.';
+      } else if (error.code === 'permission-denied') {
         description =
-          'Veritabanına yazma izniniz yok gibi görünüyor. Lütfen Firebase konsolundaki güvenlik kurallarınızı kontrol edin.';
+          'Veritabanına yazma izniniz yok. Lütfen Firebase kurallarınızı kontrol edin.';
       }
       toast({
         title: 'Hata!',
@@ -242,6 +278,24 @@ export default function EditMenuItemPage() {
                 </FormItem>
               )}
             />
+
+            <FormItem>
+              <FormLabel>Ürün Resmi</FormLabel>
+              <FormControl>
+                <Input type="file" accept="image/*" onChange={handleImageChange} className="cursor-pointer" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+
+            {imagePreview && (
+              <div>
+                <FormLabel>Resim Önizlemesi</FormLabel>
+                <div className="mt-2 relative w-full aspect-video rounded-md overflow-hidden">
+                  <Image src={imagePreview} alt="Mevcut veya seçilen resmin önizlemesi" fill className="object-cover" />
+                </div>
+              </div>
+            )}
+
             <div className="flex justify-end gap-4">
               <Button
                 type="button"

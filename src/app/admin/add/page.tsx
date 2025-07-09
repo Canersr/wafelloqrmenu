@@ -34,6 +34,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
 import { useState } from 'react';
+import Image from 'next/image';
 
 const categories = [
   'Klasik Waffle',
@@ -55,6 +56,9 @@ export default function AddMenuItemPage() {
   const router = useRouter();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -63,13 +67,41 @@ export default function AddMenuItemPage() {
       price: 0,
     },
   });
+  
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setImageFile(file);
+      setImagePreview(URL.createObjectURL(file));
+    }
+  };
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setLoading(true);
+    let imageUrl = 'https://placehold.co/600x400.png';
+
     try {
+      if (imageFile) {
+        const formData = new FormData();
+        formData.append('file', imageFile);
+        formData.append('upload_preset', process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET!);
+        
+        const res = await fetch(`https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`, {
+            method: 'POST',
+            body: formData,
+        });
+        
+        if (!res.ok) {
+            throw new Error('Resim yüklemesi başarısız oldu.');
+        }
+        
+        const data = await res.json();
+        imageUrl = data.secure_url;
+      }
+
       await addDoc(collection(db, 'menuItems'), {
         ...values,
-        imageUrl: 'https://placehold.co/600x400.png',
+        imageUrl: imageUrl,
         aiHint: values.name.split(' ').slice(0, 2).join(' ').toLowerCase(),
       });
       toast({
@@ -81,9 +113,11 @@ export default function AddMenuItemPage() {
     } catch (error: any) {
       console.error('Ekleme hatası: ', error);
       let description = 'Ürün eklenirken bir hata oluştu.';
-      if (error.code === 'permission-denied') {
+      if (error.message.includes('Cloudinary')) {
+        description = 'Resim yüklenemedi. Lütfen Cloudinary ayarlarınızı kontrol edin.';
+      } else if (error.code === 'permission-denied') {
         description =
-          'Veritabanına yazma izniniz yok gibi görünüyor. Lütfen Firebase konsolundaki Firestore güvenlik kurallarınızı kontrol edin.';
+          'Veritabanına yazma izniniz yok. Lütfen Firebase kurallarınızı kontrol edin.';
       }
       toast({
         title: 'Hata!',
@@ -173,6 +207,24 @@ export default function AddMenuItemPage() {
                 </FormItem>
               )}
             />
+
+            <FormItem>
+              <FormLabel>Ürün Resmi</FormLabel>
+              <FormControl>
+                <Input type="file" accept="image/*" onChange={handleImageChange} className="cursor-pointer" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+
+            {imagePreview && (
+              <div>
+                <FormLabel>Resim Önizlemesi</FormLabel>
+                <div className="mt-2 relative w-full aspect-video rounded-md overflow-hidden">
+                  <Image src={imagePreview} alt="Seçilen resmin önizlemesi" fill className="object-cover" />
+                </div>
+              </div>
+            )}
+
             <div className="flex justify-end gap-4">
               <Button
                 type="button"
