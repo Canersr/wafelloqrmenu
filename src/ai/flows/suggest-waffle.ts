@@ -28,6 +28,9 @@ const SuggestWaffleCombinationOutputSchema = z.object({
   reasoning: z
     .string()
     .describe('The reasoning behind the suggested combination.'),
+  catchyDescription: z
+    .string()
+    .describe('A short, catchy marketing description for the waffle.'),
 });
 export type SuggestWaffleCombinationOutput = z.infer<
   typeof SuggestWaffleCombinationOutputSchema
@@ -43,9 +46,9 @@ const prompt = ai.definePrompt({
   name: 'suggestWaffleCombinationPrompt',
   input: {schema: SuggestWaffleCombinationInputSchema},
   output: {schema: SuggestWaffleCombinationOutputSchema},
-  prompt: `You are a creative waffle chef specializing in creating unique waffle combinations.
+  prompt: `You are a creative waffle chef and a marketing genius specializing in creating unique waffle combinations.
 
-  Based on the user's preferences, suggest a waffle combination and explain your reasoning.
+  Based on the user's preferences, suggest a waffle combination, provide your reasoning, and create a short, catchy marketing description for it.
 
   User Preferences: {{{userPreferences}}}
   `,

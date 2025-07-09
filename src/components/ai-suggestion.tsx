@@ -106,6 +106,9 @@ export function AISuggestion() {
                 </div>
               </CardHeader>
               <CardContent>
+                <blockquote className="mb-4 border-l-4 border-primary/50 pl-4 italic text-foreground/90">
+                  "{result.catchyDescription}"
+                </blockquote>
                 <p className="text-foreground/80">{result.reasoning}</p>
               </CardContent>
             </Card>

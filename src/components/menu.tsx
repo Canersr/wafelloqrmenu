@@ -5,14 +5,14 @@ import type { MenuItem } from '@/types';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { MenuItemCard } from '@/components/menu-item-card';
-import { Search, Waffle, CupSoda, Cookie } from 'lucide-react';
+import { Search, Grid, CupSoda, Cookie } from 'lucide-react';
 
 interface MenuProps {
   menuItems: MenuItem[];
 }
 
 const categoryIcons = {
-  Waffles: <Waffle className="h-5 w-5 mr-2" />,
+  Waffles: <Grid className="h-5 w-5 mr-2" />,
   Drinks: <CupSoda className="h-5 w-5 mr-2" />,
   Sides: <Cookie className="h-5 w-5 mr-2" />,
 };
