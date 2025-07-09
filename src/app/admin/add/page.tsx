@@ -35,6 +35,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
 import { useState } from 'react';
+import imageCompression from 'browser-image-compression';
 
 const categories = [
   'Klasik Waffle',
@@ -81,11 +82,20 @@ export default function AddMenuItemPage() {
     setLoading(true);
     try {
       const imageFile = values.image[0] as File;
+
+      // Image compression
+      const options = {
+        maxSizeMB: 1,
+        maxWidthOrHeight: 1024,
+        useWebWorker: true,
+      };
+      const compressedFile = await imageCompression(imageFile, options);
+      
       const storageRef = ref(
         storage,
-        `menuItems/${Date.now()}-${imageFile.name}`
+        `menuItems/${Date.now()}-${compressedFile.name}`
       );
-      await uploadBytes(storageRef, imageFile);
+      await uploadBytes(storageRef, compressedFile);
       const imageUrl = await getDownloadURL(storageRef);
 
       const { image, ...dataToSave } = values;
@@ -106,7 +116,7 @@ export default function AddMenuItemPage() {
       let description = 'Ürün eklenirken bir hata oluştu.';
       if (error.code === 'permission-denied') {
         description =
-          'Veritabanına yazma izniniz yok gibi görünüyor. Lütfen Firebase konsolundaki güvenlik kurallarınızı kontrol edin.';
+          'Veritabanına yazma izniniz yok gibi görünüyor. Lütfen Firebase konsolundaki Firestore güvenlik kurallarınızı kontrol edin.';
       } else if (error.code === 'storage/unauthorized') {
         description =
           'Dosya yükleme izniniz yok. Lütfen Firebase Storage kurallarınızı kontrol edin.';
@@ -116,7 +126,8 @@ export default function AddMenuItemPage() {
         description: description,
         variant: 'destructive',
       });
-      setLoading(false);
+    } finally {
+        setLoading(false);
     }
   }
 

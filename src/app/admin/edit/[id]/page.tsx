@@ -39,6 +39,7 @@ import { useEffect, useState } from 'react';
 import { Loader2 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Label } from '@/components/ui/label';
+import imageCompression from 'browser-image-compression';
 
 const categories = [
   'Klasik Waffle',
@@ -132,11 +133,20 @@ export default function EditMenuItemPage() {
 
       if (image && image.length > 0) {
         const imageFile = image[0] as File;
+
+        // Image compression
+        const options = {
+          maxSizeMB: 1,
+          maxWidthOrHeight: 1024,
+          useWebWorker: true,
+        };
+        const compressedFile = await imageCompression(imageFile, options);
+
         const storageRef = ref(
           storage,
-          `menuItems/${Date.now()}-${imageFile.name}`
+          `menuItems/${Date.now()}-${compressedFile.name}`
         );
-        await uploadBytes(storageRef, imageFile);
+        await uploadBytes(storageRef, compressedFile);
         finalImageUrl = await getDownloadURL(storageRef);
       }
 
