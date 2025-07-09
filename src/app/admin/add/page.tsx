@@ -5,8 +5,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { collection, addDoc } from 'firebase/firestore';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { db, storage } from '@/lib/firebase';
+import { db } from '@/lib/firebase';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -35,7 +34,6 @@ import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
 import { useState } from 'react';
-import imageCompression from 'browser-image-compression';
 
 const categories = [
   'Klasik Waffle',
@@ -51,18 +49,6 @@ const formSchema = z.object({
   }),
   description: z.string().min(10, 'Açıklama en az 10 karakter olmalıdır.'),
   price: z.coerce.number().positive('Fiyat pozitif bir sayı olmalıdır.'),
-  image: z
-    .any()
-    .refine((files) => files?.length == 1, 'Resim yüklemek zorunludur.')
-    .refine(
-      (files) => files?.[0]?.size <= 5000000,
-      `Maksimum resim boyutu 5MB'dir.`
-    )
-    .refine(
-      (files) =>
-        ['image/jpeg', 'image/png', 'image/webp'].includes(files?.[0]?.type),
-      'Sadece .jpg, .png, ve .webp formatları desteklenmektedir.'
-    ),
 });
 
 export default function AddMenuItemPage() {
@@ -81,28 +67,9 @@ export default function AddMenuItemPage() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setLoading(true);
     try {
-      const imageFile = values.image[0] as File;
-
-      // Image compression
-      const options = {
-        maxSizeMB: 1,
-        maxWidthOrHeight: 1024,
-        useWebWorker: true,
-      };
-      const compressedFile = await imageCompression(imageFile, options);
-      
-      const storageRef = ref(
-        storage,
-        `menuItems/${Date.now()}-${compressedFile.name}`
-      );
-      await uploadBytes(storageRef, compressedFile);
-      const imageUrl = await getDownloadURL(storageRef);
-
-      const { image, ...dataToSave } = values;
-
       await addDoc(collection(db, 'menuItems'), {
-        ...dataToSave,
-        imageUrl: imageUrl,
+        ...values,
+        imageUrl: 'https://placehold.co/600x400.png',
         aiHint: values.name.split(' ').slice(0, 2).join(' ').toLowerCase(),
       });
       toast({
@@ -117,9 +84,6 @@ export default function AddMenuItemPage() {
       if (error.code === 'permission-denied') {
         description =
           'Veritabanına yazma izniniz yok gibi görünüyor. Lütfen Firebase konsolundaki Firestore güvenlik kurallarınızı kontrol edin.';
-      } else if (error.code === 'storage/unauthorized') {
-        description =
-          'Dosya yükleme izniniz yok. Lütfen Firebase Storage kurallarınızı kontrol edin.';
       }
       toast({
         title: 'Hata!',
@@ -204,24 +168,6 @@ export default function AddMenuItemPage() {
                   <FormLabel>Fiyat (TL)</FormLabel>
                   <FormControl>
                     <Input type="number" step="0.01" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="image"
-              render={({ field: { onChange, value, ...rest } }) => (
-                <FormItem>
-                  <FormLabel>Ürün Resmi</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="file"
-                      accept="image/png, image/jpeg, image/webp"
-                      onChange={(e) => onChange(e.target.files)}
-                      {...rest}
-                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

@@ -1,13 +1,11 @@
 'use client';
 
-import Image from 'next/image';
 import { useParams, useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { db, storage } from '@/lib/firebase';
+import { db } from '@/lib/firebase';
 import type { MenuItem } from '@/types';
 import { Button } from '@/components/ui/button';
 import {
@@ -38,8 +36,6 @@ import { useToast } from '@/hooks/use-toast';
 import { useEffect, useState } from 'react';
 import { Loader2 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Label } from '@/components/ui/label';
-import imageCompression from 'browser-image-compression';
 
 const categories = [
   'Klasik Waffle',
@@ -55,24 +51,6 @@ const formSchema = z.object({
   }),
   description: z.string().min(10, 'Açıklama en az 10 karakter olmalıdır.'),
   price: z.coerce.number().positive('Fiyat pozitif bir sayı olmalıdır.'),
-  image: z
-    .any()
-    .optional()
-    .refine(
-      (files) => !files || files.length === 0 || files.length === 1,
-      'Sadece bir resim yükleyebilirsiniz.'
-    )
-    .refine(
-      (files) => !files || files.length === 0 || files[0].size <= 5000000,
-      `Maksimum resim boyutu 5MB'dir.`
-    )
-    .refine(
-      (files) =>
-        !files ||
-        files.length === 0 ||
-        ['image/jpeg', 'image/png', 'image/webp'].includes(files[0].type),
-      'Sadece .jpg, .png, ve .webp formatları desteklenmektedir.'
-    ),
 });
 
 export default function EditMenuItemPage() {
@@ -128,30 +106,8 @@ export default function EditMenuItemPage() {
     if (!itemId || !item) return;
     setLoading(true);
     try {
-      const { image, ...dataToUpdate } = values;
-      let finalImageUrl = item.imageUrl;
-
-      if (image && image.length > 0) {
-        const imageFile = image[0] as File;
-
-        // Image compression
-        const options = {
-          maxSizeMB: 1,
-          maxWidthOrHeight: 1024,
-          useWebWorker: true,
-        };
-        const compressedFile = await imageCompression(imageFile, options);
-
-        const storageRef = ref(
-          storage,
-          `menuItems/${Date.now()}-${compressedFile.name}`
-        );
-        await uploadBytes(storageRef, compressedFile);
-        finalImageUrl = await getDownloadURL(storageRef);
-      }
-
       const docRef = doc(db, 'menuItems', itemId);
-      await updateDoc(docRef, { ...dataToUpdate, imageUrl: finalImageUrl });
+      await updateDoc(docRef, { ...values, imageUrl: item.imageUrl });
       toast({
         title: 'Başarılı!',
         description: 'Ürün başarıyla güncellendi.',
@@ -164,9 +120,6 @@ export default function EditMenuItemPage() {
       if (error.code === 'permission-denied') {
         description =
           'Veritabanına yazma izniniz yok gibi görünüyor. Lütfen Firebase konsolundaki güvenlik kurallarınızı kontrol edin.';
-      } else if (error.code === 'storage/unauthorized') {
-        description =
-          'Dosya yükleme izniniz yok. Lütfen Firebase Storage kurallarınızı kontrol edin.';
       }
       toast({
         title: 'Hata!',
@@ -284,34 +237,6 @@ export default function EditMenuItemPage() {
                   <FormLabel>Fiyat (TL)</FormLabel>
                   <FormControl>
                     <Input type="number" step="0.01" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-             <div className="space-y-2">
-              <Label>Mevcut Resim</Label>
-              <Image
-                src={item.imageUrl}
-                alt={item.name}
-                width={100}
-                height={100}
-                className="rounded-md border object-cover aspect-square"
-              />
-            </div>
-            <FormField
-              control={form.control}
-              name="image"
-              render={({ field: { onChange, value, ...rest } }) => (
-                <FormItem>
-                  <FormLabel>Resmi Değiştir (İsteğe bağlı)</FormLabel>
-                  <FormControl>
-                     <Input
-                      type="file"
-                      accept="image/png, image/jpeg, image/webp"
-                      onChange={(e) => onChange(e.target.files)}
-                      {...rest}
-                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
