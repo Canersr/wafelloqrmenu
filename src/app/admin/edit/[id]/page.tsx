@@ -70,22 +70,32 @@ export default function EditMenuItemPage() {
     
     const fetchItem = async () => {
       setFetching(true);
-      const docRef = doc(db, "menuItems", itemId);
-      const docSnap = await getDoc(docRef);
+      try {
+        const docRef = doc(db, "menuItems", itemId);
+        const docSnap = await getDoc(docRef);
 
-      if (docSnap.exists()) {
-        const data = docSnap.data() as Omit<MenuItem, 'id'>;
-        setItem({ id: docSnap.id, ...data });
-        form.reset(data);
-      } else {
+        if (docSnap.exists()) {
+          const data = docSnap.data() as Omit<MenuItem, 'id'>;
+          setItem({ id: docSnap.id, ...data });
+          form.reset(data);
+        } else {
+          toast({
+            title: "Hata",
+            description: "Ürün bulunamadı.",
+            variant: "destructive"
+          });
+          router.push('/admin');
+        }
+      } catch (error) {
+        console.error("Veri çekme hatası: ", error);
         toast({
-          title: "Hata",
-          description: "Ürün bulunamadı.",
+          title: "Veritabanı Hatası",
+          description: "Ürün bilgileri çekilirken bir hata oluştu.",
           variant: "destructive"
         });
-        router.push('/admin');
+      } finally {
+        setFetching(false);
       }
-      setFetching(false);
     };
 
     fetchItem();

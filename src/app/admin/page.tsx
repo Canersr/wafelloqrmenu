@@ -51,10 +51,18 @@ export default function AdminDashboard() {
       })) as MenuItem[];
       setMenuItems(items);
       setLoading(false);
+    }, (error) => {
+      console.error("Veri çekme hatası: ", error);
+      toast({
+        title: "Veritabanı Hatası",
+        description: "Ürünler çekilirken bir hata oluştu. Lütfen Firebase yapılandırmanızı kontrol edin.",
+        variant: "destructive"
+      });
+      setLoading(false);
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [toast]);
 
   const handleDelete = async (item: MenuItem) => {
     try {
@@ -111,7 +119,7 @@ export default function AdminDashboard() {
               ) : menuItems.length === 0 ? (
                  <TableRow>
                   <TableCell colSpan={4} className="text-center h-24 text-muted-foreground">
-                    Henüz ürün eklenmemiş.
+                    Henüz ürün eklenmemiş. "Yeni Ürün Ekle" butonu ile başlayın.
                   </TableCell>
                 </TableRow>
               ) : (
