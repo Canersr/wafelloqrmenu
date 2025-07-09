@@ -1,56 +1,58 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import type { MenuItem } from '@/types';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { Card, CardHeader } from '@/components/ui/card';
 import { MenuItemCard } from '@/components/menu-item-card';
-import { Separator } from './ui/separator';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
 interface MenuProps {
   menuItems: MenuItem[];
 }
 
+type Category = 'Tümü' | MenuItem['category'];
+
 export function Menu({ menuItems }: MenuProps) {
+  const [selectedCategory, setSelectedCategory] = useState<Category>('Tümü');
+
   const categories = useMemo(() => {
-    const categoryOrder = ['Classic Waffles', 'Sweet Waffles', 'Savory Waffles', 'Sides', 'Drinks'];
-    const uniqueCategories = [...new Set(menuItems.map((item) => item.category))];
-    return uniqueCategories.sort((a, b) => categoryOrder.indexOf(a) - categoryOrder.indexOf(b));
-  }, [menuItems]);
+    const uniqueCategories: Category[] = ['Tümü', 'Klasik Waffle', 'Meyveli Waffle', 'Çikolatalı Lezzetler', 'İçecekler'];
+    return uniqueCategories;
+  }, []);
+
+  const filteredItems = useMemo(() => {
+    if (selectedCategory === 'Tümü') {
+      return menuItems;
+    }
+    return menuItems.filter((item) => item.category === selectedCategory);
+  }, [menuItems, selectedCategory]);
 
   return (
-    <section id="menu" className="scroll-mt-20">
-      <div className="space-y-8 max-w-4xl mx-auto">
-        <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold font-headline">Menu</h2>
-            <p className="text-muted-foreground mt-2">Explore our delicious offerings</p>
-        </div>
-        
-        <Accordion type="multiple" className="w-full space-y-4" defaultValue={categories}>
-          {categories.map((category) => (
-            <AccordionItem key={category} value={category} className="border-b-0">
-              <Card className="bg-secondary/50">
-                <CardHeader className="p-0">
-                  <AccordionTrigger className="text-2xl font-bold p-6 hover:no-underline">
-                    {category}
-                  </AccordionTrigger>
-                </CardHeader>
-                <AccordionContent>
-                  <div className="pt-0 p-6 space-y-4">
-                  {menuItems
-                    .filter((item) => item.category === category)
-                    .map((item, index, arr) => (
-                      <div key={item.id}>
-                        <MenuItemCard item={item} />
-                        {index < arr.length - 1 && <Separator className="mt-4" />}
-                      </div>
-                    ))}
-                  </div>
-                </AccordionContent>
-              </Card>
-            </AccordionItem>
-          ))}
-        </Accordion>
+    <section id="menu" className="-mt-8 relative z-10">
+        <div className="container mx-auto px-4">
+            <div className="flex justify-center flex-wrap gap-2 mb-8">
+            {categories.map((category) => (
+                <Button
+                key={category}
+                onClick={() => setSelectedCategory(category)}
+                variant="ghost"
+                className={cn(
+                    "rounded-full px-6 transition-colors duration-300 font-semibold",
+                    selectedCategory === category
+                    ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                    : "bg-card text-card-foreground hover:bg-card/80"
+                )}
+                >
+                {category}
+                </Button>
+            ))}
+            </div>
+            
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredItems.map((item) => (
+                <MenuItemCard key={item.id} item={item} />
+            ))}
+            </div>
       </div>
     </section>
   );

@@ -1,7 +1,8 @@
 export type MenuItem = {
   id: number;
-  category: 'Classic Waffles' | 'Sweet Waffles' | 'Savory Waffles' | 'Sides' | 'Drinks';
+  category: 'Klasik Waffle' | 'Meyveli Waffle' | 'Çikolatalı Lezzetler' | 'İçecekler';
   name: string;
   description: string;
   price: number;
+  imageUrl: string;
 };
