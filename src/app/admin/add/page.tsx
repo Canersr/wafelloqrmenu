@@ -79,11 +79,15 @@ export default function AddMenuItemPage() {
         variant: 'default',
       });
       router.push('/admin');
-    } catch (error) {
+    } catch (error: any) {
       console.error("Ekleme hatası: ", error);
+      let description = 'Ürün eklenirken bir hata oluştu.';
+      if (error.code === 'permission-denied') {
+        description = 'Veritabanına yazma izniniz yok gibi görünüyor. Lütfen Firebase konsolundaki güvenlik kurallarınızı kontrol edin.';
+      }
       toast({
         title: 'Hata!',
-        description: 'Ürün eklenirken bir hata oluştu.',
+        description: description,
         variant: 'destructive',
       });
       setLoading(false);

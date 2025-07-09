@@ -113,11 +113,15 @@ export default function EditMenuItemPage() {
         variant: 'default',
       });
       router.push('/admin');
-    } catch (error) {
+    } catch (error: any) {
       console.error("Güncelleme hatası: ", error);
+      let description = 'Ürün güncellenirken bir hata oluştu.';
+      if (error.code === 'permission-denied') {
+        description = 'Veritabanına yazma izniniz yok gibi görünüyor. Lütfen Firebase konsolundaki güvenlik kurallarınızı kontrol edin.';
+      }
       toast({
         title: 'Hata!',
-        description: 'Ürün güncellenirken bir hata oluştu.',
+        description: description,
         variant: 'destructive',
       });
     } finally {
