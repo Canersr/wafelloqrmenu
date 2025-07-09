@@ -3,6 +3,7 @@
 import { useMemo } from 'react';
 import type { MenuItem } from '@/types';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { Card, CardHeader } from '@/components/ui/card';
 import { MenuItemCard } from '@/components/menu-item-card';
 import { Separator } from './ui/separator';
 
@@ -12,7 +13,7 @@ interface MenuProps {
 
 export function Menu({ menuItems }: MenuProps) {
   const categories = useMemo(() => {
-    const categoryOrder = ['Cajun Menus', 'Bucket Menus', 'Burgers', 'Bowls', 'Pastas', 'Salads', 'Sides', 'Sauces', 'Desserts', 'Drinks'];
+    const categoryOrder = ['Classic Waffles', 'Sweet Waffles', 'Savory Waffles', 'Sides', 'Drinks'];
     const uniqueCategories = [...new Set(menuItems.map((item) => item.category))];
     return uniqueCategories.sort((a, b) => categoryOrder.indexOf(a) - categoryOrder.indexOf(b));
   }, [menuItems]);
@@ -25,7 +26,7 @@ export function Menu({ menuItems }: MenuProps) {
             <p className="text-muted-foreground mt-2">Explore our delicious offerings</p>
         </div>
         
-        <Accordion type="multiple" className="w-full space-y-4">
+        <Accordion type="multiple" className="w-full space-y-4" defaultValue={categories}>
           {categories.map((category) => (
             <AccordionItem key={category} value={category} className="border-b-0">
               <Card className="bg-secondary/50">
@@ -54,7 +55,3 @@ export function Menu({ menuItems }: MenuProps) {
     </section>
   );
 }
-
-// Dummy Card components for structure, assuming they exist or are defined elsewhere
-const Card = ({ className, children }: { className?: string, children: React.ReactNode }) => <div className={className}>{children}</div>;
-const CardHeader = ({ className, children }: { className?: string, children: React.ReactNode }) => <div className={className}>{children}</div>;

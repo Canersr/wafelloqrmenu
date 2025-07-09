@@ -6,8 +6,8 @@ import './globals.css';
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 
 export const metadata: Metadata = {
-  title: 'Cajun Food Center',
-  description: 'Digital Menu for Cajun Food Center Izmir. Enjoy our delicious food!',
+  title: 'Wafello - The Art of Waffles',
+  description: 'The most delicious waffles in town!',
 };
 
 export default function RootLayout({

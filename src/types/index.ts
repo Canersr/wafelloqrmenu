@@ -1,6 +1,6 @@
 export type MenuItem = {
   id: number;
-  category: 'Cajun Menus' | 'Bucket Menus' | 'Burgers' | 'Bowls' | 'Pastas' | 'Salads' | 'Sides' | 'Sauces' | 'Desserts' | 'Drinks';
+  category: 'Classic Waffles' | 'Sweet Waffles' | 'Savory Waffles' | 'Sides' | 'Drinks';
   name: string;
   description: string;
   price: number;

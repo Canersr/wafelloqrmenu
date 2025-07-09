@@ -8,9 +8,9 @@ export function Header() {
         <div className="flex flex-col items-center gap-2">
           <UtensilsCrossed className="h-12 w-12 text-primary" />
           <h1 className="text-4xl font-extrabold font-headline text-foreground tracking-tight">
-            Cajun Food Center
+            Wafello
           </h1>
-          <p className="text-muted-foreground">Welcome to our digital menu!</p>
+          <p className="text-muted-foreground">Welcome to the Art of Waffles!</p>
         </div>
         <div className="flex items-center gap-2">
           <Button variant="ghost" size="icon" asChild>
