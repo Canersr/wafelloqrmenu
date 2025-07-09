@@ -35,6 +35,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
 import { useState } from 'react';
 import Image from 'next/image';
+import { compressImage } from '@/lib/image-compressor';
 
 const categories = [
   'Klasik Waffle',
@@ -56,6 +57,7 @@ export default function AddMenuItemPage() {
   const router = useRouter();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
+  const [isCompressing, setIsCompressing] = useState(false);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
 
@@ -68,11 +70,25 @@ export default function AddMenuItemPage() {
     },
   });
   
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      setImageFile(file);
-      setImagePreview(URL.createObjectURL(file));
+      setImageFile(null); // Reset previous file
+      setImagePreview(URL.createObjectURL(file)); // Show preview instantly
+      setIsCompressing(true);
+      try {
+        const compressedFile = await compressImage(file);
+        setImageFile(compressedFile);
+      } catch (error) {
+        toast({
+            title: 'Uyarı',
+            description: 'Resim sıkıştırılamadı, orijinal dosya kullanılacak. Yükleme biraz daha uzun sürebilir.',
+            variant: 'default',
+        });
+        setImageFile(file); // Fallback to original file
+      } finally {
+        setIsCompressing(false);
+      }
     }
   };
 
@@ -211,8 +227,9 @@ export default function AddMenuItemPage() {
             <FormItem>
               <FormLabel>Ürün Resmi</FormLabel>
               <FormControl>
-                <Input type="file" accept="image/*" onChange={handleImageChange} className="cursor-pointer" />
+                <Input type="file" accept="image/*" onChange={handleImageChange} className="cursor-pointer" disabled={isCompressing}/>
               </FormControl>
+              {isCompressing && <p className="text-sm text-muted-foreground mt-2">Resim optimize ediliyor, lütfen bekleyin...</p>}
               <FormMessage />
             </FormItem>
 
@@ -230,13 +247,13 @@ export default function AddMenuItemPage() {
                 type="button"
                 variant="outline"
                 onClick={() => router.back()}
-                disabled={loading}
+                disabled={loading || isCompressing}
               >
                 İptal
               </Button>
-              <Button type="submit" disabled={loading}>
-                {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Kaydet
+              <Button type="submit" disabled={loading || isCompressing || !imageFile && !!imagePreview}>
+                {(loading || isCompressing) && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                {isCompressing ? 'Resim Hazırlanıyor...' : loading ? 'Kaydediliyor...' : 'Kaydet'}
               </Button>
             </div>
           </form>
