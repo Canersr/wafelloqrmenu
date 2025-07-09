@@ -9,7 +9,7 @@ interface MenuItemCardProps {
 }
 
 export function MenuItemCard({ item }: MenuItemCardProps) {
-  const hint = item.name.split(' ').slice(0, 2).join(' ').toLowerCase();
+  const hint = item.aiHint ?? item.name.split(' ').slice(0, 2).join(' ').toLowerCase();
   return (
     <Card className="overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 flex flex-col h-full bg-card border-none rounded-xl">
       <CardHeader className="p-0 relative h-48">

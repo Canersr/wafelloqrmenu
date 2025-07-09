@@ -5,4 +5,5 @@ export type MenuItem = {
   description: string;
   price: number;
   imageUrl: string;
+  aiHint?: string;
 };

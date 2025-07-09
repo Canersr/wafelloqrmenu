@@ -8,7 +8,8 @@ export const menuItems: MenuItem[] = [
     name: 'Belçika Usulü',
     description: 'Pudra şekeri ve akçaağaç şurubu ile servis edilen klasik Belçika waffle.',
     price: 180.00,
-    imageUrl: 'https://placehold.co/600x400.png',
+    imageUrl: 'https://placehold.co/600x400/E1C16E/31343C.png',
+    aiHint: 'belgian waffle',
   },
   // Meyveli Waffle
   {
@@ -17,7 +18,8 @@ export const menuItems: MenuItem[] = [
     name: 'Beyaz Büyü',
     description: 'Beyaz çikolata, Hindistan cevizi, badem ve muz dilimleri.',
     price: 255.00,
-    imageUrl: 'https://placehold.co/600x400.png',
+    imageUrl: 'https://placehold.co/600x400/F5F5DC/31343C.png',
+    aiHint: 'white chocolate',
   },
   {
     id: 3,
@@ -25,7 +27,8 @@ export const menuItems: MenuItem[] = [
     name: 'Çilekli Rüyası',
     description: 'Taze çilekler, cheesecake kreması ve bisküvi kırıntıları.',
     price: 250.00,
-    imageUrl: 'https://placehold.co/600x400.png',
+    imageUrl: 'https://placehold.co/600x400/DE3163/FFFFFF.png',
+    aiHint: 'strawberry waffle',
   },
   // Çikolatalı Lezzetler
   {
@@ -34,7 +37,8 @@ export const menuItems: MenuItem[] = [
     name: 'Çikolata Şelalesi',
     description: 'Bol Nutella, beyaz çikolata sosu, fındık ve çikolata parçacıkları.',
     price: 265.00,
-    imageUrl: 'https://placehold.co/600x400.png',
+    imageUrl: 'https://placehold.co/600x400/7B3F00/FFFFFF.png',
+    aiHint: 'chocolate waffle',
   },
   {
     id: 5,
@@ -42,7 +46,8 @@ export const menuItems: MenuItem[] = [
     name: 'Oreo Canavarı',
     description: 'Oreo parçacıkları, beyaz çikolata sosu ve vanilyalı dondurma.',
     price: 280.00,
-    imageUrl: 'https://placehold.co/600x400.png',
+    imageUrl: 'https://placehold.co/600x400/2F4F4F/FFFFFF.png',
+    aiHint: 'oreo waffle',
   },
   {
     id: 6,
@@ -50,7 +55,8 @@ export const menuItems: MenuItem[] = [
     name: 'Lotus Biscoff Keyfi',
     description: 'Lotus Biscoff kreması, kırılmış Lotus bisküvileri ve bir top vanilyalı dondurma.',
     price: 245.00,
-    imageUrl: 'https://placehold.co/600x400.png',
+    imageUrl: 'https://placehold.co/600x400/C47222/FFFFFF.png',
+    aiHint: 'lotus waffle',
   },
   // İçecekler
   {
@@ -59,7 +65,8 @@ export const menuItems: MenuItem[] = [
     name: 'Ev Yapımı Limonata',
     description: 'Taze sıkılmış, ferahlatıcı limonata.',
     price: 90.00,
-    imageUrl: 'https://placehold.co/600x400.png',
+    imageUrl: 'https://placehold.co/600x400/FFFACD/31343C.png',
+    aiHint: 'lemonade glass',
   },
   {
     id: 8,
@@ -67,7 +74,8 @@ export const menuItems: MenuItem[] = [
     name: 'Latte',
     description: 'Espresso ve buharda ısıtılmış sütün mükemmel uyumu.',
     price: 80.00,
-    imageUrl: 'https://placehold.co/600x400.png',
+    imageUrl: 'https://placehold.co/600x400/C9A891/31343C.png',
+    aiHint: 'latte art',
   },
   {
     id: 9,
@@ -75,7 +83,8 @@ export const menuItems: MenuItem[] = [
     name: 'Sıcak Çikolata',
     description: 'Yoğun ve kremalı sıcak çikolata.',
     price: 95.00,
-    imageUrl: 'https://placehold.co/600x400.png',
+    imageUrl: 'https://placehold.co/600x400/5C4033/FFFFFF.png',
+    aiHint: 'hot chocolate',
   },
   {
     id: 10,
@@ -83,6 +92,7 @@ export const menuItems: MenuItem[] = [
     name: 'Filtre Kahve',
     description: 'Taze demlenmiş, aromatik filtre kahve.',
     price: 70.00,
-    imageUrl: 'https://placehold.co/600x400.png',
+    imageUrl: 'https://placehold.co/600x400/3B2F2F/FFFFFF.png',
+    aiHint: 'filter coffee',
   },
 ];
