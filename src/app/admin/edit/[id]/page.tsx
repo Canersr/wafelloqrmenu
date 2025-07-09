@@ -1,11 +1,13 @@
 'use client';
 
+import Image from 'next/image';
 import { useParams, useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { db, storage } from '@/lib/firebase';
 import type { MenuItem } from '@/types';
 import { Button } from '@/components/ui/button';
 import {
@@ -36,7 +38,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useEffect, useState } from 'react';
 import { Loader2 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
-
+import { Label } from '@/components/ui/label';
 
 const categories = [
   'Klasik Waffle',
@@ -47,9 +49,29 @@ const categories = [
 
 const formSchema = z.object({
   name: z.string().min(2, 'İsim en az 2 karakter olmalıdır.'),
-  category: z.enum([...categories] as [string, ...string[]], { required_error: 'Lütfen bir kategori seçin.' }),
+  category: z.enum([...categories] as [string, ...string[]], {
+    required_error: 'Lütfen bir kategori seçin.',
+  }),
   description: z.string().min(10, 'Açıklama en az 10 karakter olmalıdır.'),
   price: z.coerce.number().positive('Fiyat pozitif bir sayı olmalıdır.'),
+  image: z
+    .any()
+    .optional()
+    .refine(
+      (files) => !files || files.length === 0 || files.length === 1,
+      'Sadece bir resim yükleyebilirsiniz.'
+    )
+    .refine(
+      (files) => !files || files.length === 0 || files[0].size <= 5000000,
+      `Maksimum resim boyutu 5MB'dir.`
+    )
+    .refine(
+      (files) =>
+        !files ||
+        files.length === 0 ||
+        ['image/jpeg', 'image/png', 'image/webp'].includes(files[0].type),
+      'Sadece .jpg, .png, ve .webp formatları desteklenmektedir.'
+    ),
 });
 
 export default function EditMenuItemPage() {
@@ -67,11 +89,11 @@ export default function EditMenuItemPage() {
 
   useEffect(() => {
     if (!itemId) return;
-    
+
     const fetchItem = async () => {
       setFetching(true);
       try {
-        const docRef = doc(db, "menuItems", itemId);
+        const docRef = doc(db, 'menuItems', itemId);
         const docSnap = await getDoc(docRef);
 
         if (docSnap.exists()) {
@@ -80,18 +102,18 @@ export default function EditMenuItemPage() {
           form.reset(data);
         } else {
           toast({
-            title: "Hata",
-            description: "Ürün bulunamadı.",
-            variant: "destructive"
+            title: 'Hata',
+            description: 'Ürün bulunamadı.',
+            variant: 'destructive',
           });
           router.push('/admin');
         }
       } catch (error) {
-        console.error("Veri çekme hatası: ", error);
+        console.error('Veri çekme hatası: ', error);
         toast({
-          title: "Veritabanı Hatası",
-          description: "Ürün bilgileri çekilirken bir hata oluştu.",
-          variant: "destructive"
+          title: 'Veritabanı Hatası',
+          description: 'Ürün bilgileri çekilirken bir hata oluştu.',
+          variant: 'destructive',
         });
       } finally {
         setFetching(false);
@@ -102,11 +124,24 @@ export default function EditMenuItemPage() {
   }, [itemId, form, router, toast]);
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    if (!itemId) return;
+    if (!itemId || !item) return;
     setLoading(true);
     try {
+      const { image, ...dataToUpdate } = values;
+      let finalImageUrl = item.imageUrl;
+
+      if (image && image.length > 0) {
+        const imageFile = image[0] as File;
+        const storageRef = ref(
+          storage,
+          `menuItems/${Date.now()}-${imageFile.name}`
+        );
+        await uploadBytes(storageRef, imageFile);
+        finalImageUrl = await getDownloadURL(storageRef);
+      }
+
       const docRef = doc(db, 'menuItems', itemId);
-      await updateDoc(docRef, values);
+      await updateDoc(docRef, { ...dataToUpdate, imageUrl: finalImageUrl });
       toast({
         title: 'Başarılı!',
         description: 'Ürün başarıyla güncellendi.',
@@ -114,10 +149,14 @@ export default function EditMenuItemPage() {
       });
       router.push('/admin');
     } catch (error: any) {
-      console.error("Güncelleme hatası: ", error);
+      console.error('Güncelleme hatası: ', error);
       let description = 'Ürün güncellenirken bir hata oluştu.';
       if (error.code === 'permission-denied') {
-        description = 'Veritabanına yazma izniniz yok gibi görünüyor. Lütfen Firebase konsolundaki güvenlik kurallarınızı kontrol edin.';
+        description =
+          'Veritabanına yazma izniniz yok gibi görünüyor. Lütfen Firebase konsolundaki güvenlik kurallarınızı kontrol edin.';
+      } else if (error.code === 'storage/unauthorized') {
+        description =
+          'Dosya yükleme izniniz yok. Lütfen Firebase Storage kurallarınızı kontrol edin.';
       }
       toast({
         title: 'Hata!',
@@ -131,7 +170,7 @@ export default function EditMenuItemPage() {
 
   if (fetching) {
     return (
-       <Card>
+      <Card>
         <CardHeader>
           <Skeleton className="h-8 w-1/2" />
           <Skeleton className="h-4 w-1/3" />
@@ -159,7 +198,6 @@ export default function EditMenuItemPage() {
   }
 
   if (!item) {
-    // This case is handled by the useEffect redirect, but as a fallback.
     return <p>Ürün yüklenemedi.</p>;
   }
 
@@ -167,9 +205,7 @@ export default function EditMenuItemPage() {
     <Card>
       <CardHeader>
         <CardTitle>Ürünü Düzenle</CardTitle>
-        <CardDescription>
-          "{item.name}" adlı ürünü güncelleyin.
-        </CardDescription>
+        <CardDescription>"{item.name}" adlı ürünü güncelleyin.</CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -238,6 +274,34 @@ export default function EditMenuItemPage() {
                   <FormLabel>Fiyat (TL)</FormLabel>
                   <FormControl>
                     <Input type="number" step="0.01" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+             <div className="space-y-2">
+              <Label>Mevcut Resim</Label>
+              <Image
+                src={item.imageUrl}
+                alt={item.name}
+                width={100}
+                height={100}
+                className="rounded-md border object-cover aspect-square"
+              />
+            </div>
+            <FormField
+              control={form.control}
+              name="image"
+              render={({ field: { onChange, value, ...rest } }) => (
+                <FormItem>
+                  <FormLabel>Resmi Değiştir (İsteğe bağlı)</FormLabel>
+                  <FormControl>
+                     <Input
+                      type="file"
+                      accept="image/png, image/jpeg, image/webp"
+                      onChange={(e) => onChange(e.target.files)}
+                      {...rest}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

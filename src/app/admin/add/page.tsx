@@ -5,7 +5,8 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { collection, addDoc } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { db, storage } from '@/lib/firebase';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -44,12 +45,23 @@ const categories = [
 
 const formSchema = z.object({
   name: z.string().min(2, 'İsim en az 2 karakter olmalıdır.'),
-  category: z.enum(
-    [...categories] as [string, ...string[]],
-    { required_error: 'Lütfen bir kategori seçin.' }
-  ),
+  category: z.enum([...categories] as [string, ...string[]], {
+    required_error: 'Lütfen bir kategori seçin.',
+  }),
   description: z.string().min(10, 'Açıklama en az 10 karakter olmalıdır.'),
   price: z.coerce.number().positive('Fiyat pozitif bir sayı olmalıdır.'),
+  image: z
+    .any()
+    .refine((files) => files?.length == 1, 'Resim yüklemek zorunludur.')
+    .refine(
+      (files) => files?.[0]?.size <= 5000000,
+      `Maksimum resim boyutu 5MB'dir.`
+    )
+    .refine(
+      (files) =>
+        ['image/jpeg', 'image/png', 'image/webp'].includes(files?.[0]?.type),
+      'Sadece .jpg, .png, ve .webp formatları desteklenmektedir.'
+    ),
 });
 
 export default function AddMenuItemPage() {
@@ -68,9 +80,19 @@ export default function AddMenuItemPage() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setLoading(true);
     try {
+      const imageFile = values.image[0] as File;
+      const storageRef = ref(
+        storage,
+        `menuItems/${Date.now()}-${imageFile.name}`
+      );
+      await uploadBytes(storageRef, imageFile);
+      const imageUrl = await getDownloadURL(storageRef);
+
+      const { image, ...dataToSave } = values;
+
       await addDoc(collection(db, 'menuItems'), {
-        ...values,
-        imageUrl: `https://placehold.co/600x400.png`,
+        ...dataToSave,
+        imageUrl: imageUrl,
         aiHint: values.name.split(' ').slice(0, 2).join(' ').toLowerCase(),
       });
       toast({
@@ -80,10 +102,14 @@ export default function AddMenuItemPage() {
       });
       router.push('/admin');
     } catch (error: any) {
-      console.error("Ekleme hatası: ", error);
+      console.error('Ekleme hatası: ', error);
       let description = 'Ürün eklenirken bir hata oluştu.';
       if (error.code === 'permission-denied') {
-        description = 'Veritabanına yazma izniniz yok gibi görünüyor. Lütfen Firebase konsolundaki güvenlik kurallarınızı kontrol edin.';
+        description =
+          'Veritabanına yazma izniniz yok gibi görünüyor. Lütfen Firebase konsolundaki güvenlik kurallarınızı kontrol edin.';
+      } else if (error.code === 'storage/unauthorized') {
+        description =
+          'Dosya yükleme izniniz yok. Lütfen Firebase Storage kurallarınızı kontrol edin.';
       }
       toast({
         title: 'Hata!',
@@ -167,6 +193,24 @@ export default function AddMenuItemPage() {
                   <FormLabel>Fiyat (TL)</FormLabel>
                   <FormControl>
                     <Input type="number" step="0.01" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="image"
+              render={({ field: { onChange, value, ...rest } }) => (
+                <FormItem>
+                  <FormLabel>Ürün Resmi</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="file"
+                      accept="image/png, image/jpeg, image/webp"
+                      onChange={(e) => onChange(e.target.files)}
+                      {...rest}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
