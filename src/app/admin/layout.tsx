@@ -66,9 +66,6 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
             Wafello Yönetim Paneli
           </Link>
           <div className="flex items-center gap-4">
-            <Link href="/" className="text-sm text-gray-600 hover:text-primary transition-colors">
-              Siteye Dön
-            </Link>
             <Button variant="ghost" size="sm" onClick={handleSignOut}>
               <LogOut className="mr-2 h-4 w-4" />
               Çıkış Yap
