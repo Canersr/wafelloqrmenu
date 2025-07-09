@@ -39,23 +39,30 @@ export default function AdminDashboard() {
   const { toast } = useToast();
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [dbError, setDbError] = useState<string | null>(null);
 
   useEffect(() => {
     const menuItemsCollection = collection(db, 'menuItems');
     const q = query(menuItemsCollection, orderBy('name'));
     
     const unsubscribe = onSnapshot(q, (snapshot) => {
+      setDbError(null);
       const items = snapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data()
       })) as MenuItem[];
       setMenuItems(items);
       setLoading(false);
-    }, (error) => {
+    }, (error: any) => {
       console.error("Veri çekme hatası: ", error);
+      let desc = "Ürünler çekilirken bir hata oluştu. Lütfen Firebase yapılandırmanızı kontrol edin.";
+      if (error.code === 'permission-denied') {
+        desc = "Veritabanına erişim izniniz yok. Lütfen Firebase konsolundaki Firestore güvenlik kurallarınızı kontrol edin.";
+      }
+      setDbError(desc);
       toast({
         title: "Veritabanı Hatası",
-        description: "Ürünler çekilirken bir hata oluştu. Lütfen Firebase yapılandırmanızı ve güvenlik kurallarınızı kontrol edin.",
+        description: desc,
         variant: "destructive"
       });
       setLoading(false);
@@ -72,11 +79,15 @@ export default function AdminDashboard() {
         description: `"${item.name}" adlı ürün başarıyla silindi.`,
         variant: 'default',
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error("Silme hatası: ", error);
+      let description = 'Ürün silinirken bir hata oluştu.';
+      if (error.code === 'permission-denied') {
+        description = 'Veritabanına yazma izniniz yok gibi görünüyor. Lütfen Firebase konsolundaki güvenlik kurallarınızı kontrol edin.';
+      }
       toast({
         title: 'Hata!',
-        description: 'Ürün silinirken bir hata oluştu.',
+        description: description,
         variant: 'destructive',
       });
     }
@@ -114,6 +125,12 @@ export default function AdminDashboard() {
                 <TableRow>
                   <TableCell colSpan={4} className="text-center h-24">
                     <Loader2 className="h-6 w-6 animate-spin inline-block" />
+                  </TableCell>
+                </TableRow>
+              ) : dbError ? (
+                 <TableRow>
+                  <TableCell colSpan={4} className="text-center h-24 text-destructive">
+                    Hata: {dbError}
                   </TableCell>
                 </TableRow>
               ) : menuItems.length === 0 ? (
