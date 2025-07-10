@@ -6,6 +6,14 @@ import { MenuHeader } from '@/components/menu-header';
 import { Menu } from '@/components/menu';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
+import { unstable_noStore as noStore } from 'next/cache';
+
+// By default, Next.js would cache this data forever.
+// We use revalidation to ensure the data is fresh without sacrificing speed.
+// This tells Next.js to fetch new data at most once every 60 seconds.
+export const revalidate = 60; 
+// Force dynamic rendering to ensure revalidation works as expected.
+export const dynamic = 'force-dynamic'
 
 async function getMenuItems(): Promise<MenuItem[]> {
   try {
@@ -33,7 +41,7 @@ export default async function MenuPage() {
       <main className="flex-1 py-12">
         {menuItems.length === 0 ? (
             <div className="container mx-auto px-4 text-center">
-                <p className="text-muted-foreground">No menu items found. Please add items from the admin panel.</p>
+                <p className="text-muted-foreground">Menüde gösterilecek ürün bulunamadı. Lütfen yönetim panelinden ürün ekleyin.</p>
             </div>
         ) : (
           <Menu menuItems={menuItems} />
