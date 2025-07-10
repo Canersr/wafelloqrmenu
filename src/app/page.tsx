@@ -14,8 +14,9 @@ import {
 
 export default function HomePage() {
   const address = 'Sinan, 1254. Sk. No:18/D, 07170 Muratpaşa/Antalya';
-  const googleMapsEmbedUrl = `https://maps.google.com/maps?q=Sinan%2C%201254.%20Sk.%20No%3A18%2FD%2C%2007170%20Muratpa%C5%9Fa%2FAntalya&t=&z=17&ie=UTF8&iwloc=&output=embed`;
-  const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=Sinan%2C+1254.+Sk.+No%3A18%2FD%2C+07170+Muratpa%C5%9Fa%2FAntalya`
+  const encodedAddress = encodeURIComponent(address);
+  const googleMapsEmbedUrl = `https://maps.google.com/maps?q=${encodedAddress}&t=&z=17&ie=UTF8&iwloc=&output=embed`;
+  const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodedAddress}`
 
   return (
     <div className="flex flex-col min-h-dvh bg-background text-foreground font-body">
@@ -78,7 +79,7 @@ export default function HomePage() {
                   <DialogTitle>Konumumuz</DialogTitle>
                   <DialogDescription>{address}</DialogDescription>
                 </DialogHeader>
-                <div className="aspect-[4/3] w-full">
+                <div className="relative aspect-[4/3] w-full group">
                   <iframe
                     width="100%"
                     height="100%"
@@ -88,6 +89,17 @@ export default function HomePage() {
                     referrerPolicy="no-referrer-when-downgrade"
                     src={googleMapsEmbedUrl}
                   ></iframe>
+                   <a
+                    href={googleMapsUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="absolute inset-0 cursor-pointer"
+                    aria-label="Google Haritalar'da yol tarifi al"
+                  >
+                    <div className="absolute bottom-2 right-2 bg-background/80 backdrop-blur-sm p-2 rounded-md text-xs text-foreground opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                      Yol tarifi al
+                    </div>
+                  </a>
                 </div>
               </DialogContent>
             </Dialog>
