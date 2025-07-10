@@ -13,8 +13,8 @@ import {
 } from '@/components/ui/dialog';
 
 export default function HomePage() {
-  const address = 'Sinan mh 1254.sk Aras Bedesteni İşhanı no 18D, Muratpaşa/Antalya';
-  const googleMapsEmbedUrl = `https://maps.google.com/maps?q=Sinan%20mh%201254.sk%20Aras%20Bedesteni%20%C4%B0%C5%9Fhan%C4%B1%20no%2018D%2C%20Muratpa%C5%9Fa%2FAntalya&t=&z=17&ie=UTF8&iwloc=&output=embed`;
+  const address = 'Sultan İşhanı, Sinan, 1254. Sk. D:33, 07100 Muratpaşa/Antalya';
+  const googleMapsEmbedUrl = `https://maps.google.com/maps?q=Sultan%20%C4%B0%C5%9Fhan%C4%B1%2C%20Sinan%2C%201254.%20Sk.%20D%3A33%2C%2007100%20Muratpa%C5%9Fa%2FAntalya&t=&z=17&ie=UTF8&iwloc=&output=embed`;
 
   return (
     <div className="flex flex-col min-h-dvh bg-background text-foreground font-body">
@@ -28,14 +28,14 @@ export default function HomePage() {
             +90 537 791 46 62
           </a>
           <a
-            href="https://www.google.com/maps/search/?api=1&query=Sinan+mh+1254.sk+Aras+Bedesteni+%C4%B0%C5%9Fhan%C4%B1+no+18D"
+            href="https://www.google.com/maps/search/?api=1&query=Sultan+%C4%B0%C5%9Fhan%C4%B1%2C+Sinan%2C+1254.+Sk.+D%3A33%2C+07100+Muratpa%C5%9Fa%2FAntalya"
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-2 text-right hover:text-primary transition-colors"
           >
             <MapPin size={16} />
             <p className="hidden sm:block max-w-[150px] sm:max-w-xs text-right">
-              Sinan mh 1254.sk Aras Bedesteni İşhanı no 18D
+              {address}
             </p>
           </a>
         </div>
