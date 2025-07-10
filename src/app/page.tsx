@@ -10,7 +10,7 @@ import {
   Link as LinkIcon,
   Twitter,
   Facebook,
-  MessageCircle, // WhatsApp için yeni ikon
+  MessageCircle,
 } from 'lucide-react';
 import Link from 'next/link';
 import { WaffleLogo } from '@/components/waffle-logo';
@@ -86,7 +86,7 @@ export default function HomePage() {
   return (
     <div className="flex flex-col min-h-dvh bg-background text-foreground font-body">
       <header className="w-full">
-        <div className="container mx-auto flex justify-between items-center p-4 text-sm">
+        <div className="container mx-auto flex justify-between items-start p-4 text-sm">
           <a
             href="tel:+905377914662"
             className="flex items-center gap-2 hover:text-primary transition-colors"
@@ -98,10 +98,10 @@ export default function HomePage() {
             href={googleMapsUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-2 text-right hover:text-primary transition-colors"
+            className="flex items-start gap-2 text-right hover:text-primary transition-colors"
           >
-            <MapPin size={16} />
-            <p className="hidden sm:block max-w-[150px] sm:max-w-xs text-right">
+            <MapPin size={16} className="mt-0.5" />
+            <p className="max-w-[150px] sm:max-w-xs text-right">
               {address}
             </p>
           </a>
