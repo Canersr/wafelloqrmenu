@@ -13,8 +13,9 @@ import {
 } from '@/components/ui/dialog';
 
 export default function HomePage() {
-  const address = 'Sultan İşhanı, Sinan, 1254. Sk. D:33, 07100 Muratpaşa/Antalya';
-  const googleMapsEmbedUrl = `https://maps.google.com/maps?q=Sultan%20%C4%B0%C5%9Fhan%C4%B1%2C%20Sinan%2C%201254.%20Sk.%20D%3A33%2C%2007100%20Muratpa%C5%9Fa%2FAntalya&t=&z=17&ie=UTF8&iwloc=&output=embed`;
+  const address = 'Sinan, 1254. Sk. No:18/D, 07170 Muratpaşa/Antalya';
+  const googleMapsEmbedUrl = `https://maps.google.com/maps?q=Sinan%2C%201254.%20Sk.%20No%3A18%2FD%2C%2007170%20Muratpa%C5%9Fa%2FAntalya&t=&z=17&ie=UTF8&iwloc=&output=embed`;
+  const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=Sinan%2C+1254.+Sk.+No%3A18%2FD%2C+07170+Muratpa%C5%9Fa%2FAntalya`
 
   return (
     <div className="flex flex-col min-h-dvh bg-background text-foreground font-body">
@@ -28,7 +29,7 @@ export default function HomePage() {
             +90 537 791 46 62
           </a>
           <a
-            href="https://www.google.com/maps/search/?api=1&query=Sultan+%C4%B0%C5%9Fhan%C4%B1%2C+Sinan%2C+1254.+Sk.+D%3A33%2C+07100+Muratpa%C5%9Fa%2FAntalya"
+            href={googleMapsUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-2 text-right hover:text-primary transition-colors"
