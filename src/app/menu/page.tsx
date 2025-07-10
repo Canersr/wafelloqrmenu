@@ -1,4 +1,3 @@
-'use server';
 
 import { collection, getDocs, orderBy, query } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
@@ -20,7 +19,7 @@ async function getMenuItems(): Promise<MenuItem[]> {
     return items;
   } catch (error) {
     console.error("Error fetching menu items: ", error);
-    // Hata durumunda boş bir dizi döndürüyoruz ki sayfa bozulmasın.
+    // In case of an error, we return an empty array so the page doesn't break.
     return [];
   }
 }
@@ -34,7 +33,7 @@ export default async function MenuPage() {
       <main className="flex-1 py-12">
         {menuItems.length === 0 ? (
             <div className="container mx-auto px-4 text-center">
-                <p className="text-muted-foreground">Menüde gösterilecek ürün bulunamadı. Lütfen yönetim panelinden ürün ekleyin.</p>
+                <p className="text-muted-foreground">No menu items found. Please add items from the admin panel.</p>
             </div>
         ) : (
           <Menu menuItems={menuItems} />
@@ -44,8 +43,8 @@ export default async function MenuPage() {
   );
 }
 
-// Yükleme durumunu göstermek için React Suspense ile kullanılabilen bir yedek bileşen.
-// Next.js bunu otomatik olarak algılayıp kullanabilir.
+// A fallback component that can be used with React Suspense to show a loading state.
+// Next.js can detect and use this automatically.
 export function Loading() {
  return (
     <div className="flex flex-col min-h-dvh bg-background">
