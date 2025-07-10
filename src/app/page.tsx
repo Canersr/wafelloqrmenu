@@ -14,9 +14,7 @@ import {
 
 export default function HomePage() {
   const address = 'Sinan mh 1254.sk Aras Bedesteni İşhanı no 18D, Muratpaşa/Antalya';
-  const googleMapsEmbedUrl = `https://www.google.com/maps/embed/v1/place?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&q=${encodeURIComponent(
-    address
-  )}`;
+  const googleMapsEmbedUrl = `https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3191.0425317769913!2d30.70799697648939!3d36.88938996417546!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x14c39178d4924c8b%3A0xc3c54be5f1428a2!2sAras%20Bedesteni%20%C4%B0%C5%9Fhan%C4%B1!5e0!3m2!1str!2str!4v1752200067098!5m2!1str!2str`;
 
   return (
     <div className="flex flex-col min-h-dvh bg-background text-foreground font-body">
@@ -30,7 +28,7 @@ export default function HomePage() {
             +90 537 791 46 62
           </a>
           <a
-            href="https://www.google.com/maps/search/?api=1&query=Sinan+mh+1254.sk+Aras+Bedesteni+İşhanı+no+18D"
+            href="https://www.google.com/maps/search/?api=1&query=Sinan+mh+1254.sk+Aras+Bedesteni+%C4%B0%C5%9Fhan%C4%B1+no+18D"
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-2 text-right hover:text-primary transition-colors"
