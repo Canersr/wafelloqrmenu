@@ -12,7 +12,7 @@ export function MenuHeader() {
             <ChevronLeft className="h-6 w-6" />
           </Button>
         </Link>
-        <div className="flex items-center justify-center gap-4">
+        <div className="flex items-center justify-center gap-4 select-none">
           <WaffleLogo className="w-28 h-28" />
           <h1 className="text-7xl sm:text-8xl font-handwriting text-primary">
             Wafello
