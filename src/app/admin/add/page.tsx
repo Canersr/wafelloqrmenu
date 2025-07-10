@@ -32,10 +32,11 @@ import {
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Sparkles } from 'lucide-react';
 import { useState } from 'react';
 import Image from 'next/image';
 import { compressImage } from '@/lib/image-compressor';
+import { generateDescription } from '@/ai/flows/generate-description';
 
 const categories = [
   'Klasik Waffle',
@@ -57,6 +58,7 @@ export default function AddMenuItemPage() {
   const router = useRouter();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
+  const [isAiLoading, setIsAiLoading] = useState(false);
   const [isCompressing, setIsCompressing] = useState(false);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -91,6 +93,40 @@ export default function AddMenuItemPage() {
       }
     }
   };
+
+  const handleGenerateDescription = async () => {
+    const productName = form.getValues('name');
+    const category = form.getValues('category');
+
+    if (!productName || !category) {
+      toast({
+        title: 'Eksik Bilgi',
+        description: 'Lütfen önce ürün adını ve kategorisini doldurun.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    setIsAiLoading(true);
+    try {
+      const result = await generateDescription({ productName, category });
+      form.setValue('description', result.description, { shouldValidate: true });
+      toast({
+        title: 'Başarılı!',
+        description: 'Yapay zeka açıklamayı oluşturdu.',
+      });
+    } catch (error) {
+      console.error('AI description error:', error);
+      toast({
+        title: 'Yapay Zeka Hatası',
+        description: 'Açıklama oluşturulurken bir hata oluştu.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsAiLoading(false);
+    }
+  };
+
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setLoading(true);
@@ -199,10 +235,27 @@ export default function AddMenuItemPage() {
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Açıklama</FormLabel>
+                  <div className="flex justify-between items-center">
+                    <FormLabel>Açıklama</FormLabel>
+                     <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={handleGenerateDescription}
+                        disabled={isAiLoading}
+                        className="text-xs"
+                      >
+                        {isAiLoading ? (
+                          <Loader2 className="mr-2 h-3 w-3 animate-spin" />
+                        ) : (
+                          <Sparkles className="mr-2 h-3 w-3" />
+                        )}
+                        AI ile Oluştur
+                      </Button>
+                  </div>
                   <FormControl>
                     <Textarea
-                      placeholder="Ürün hakkında kısa bir açıklama..."
+                      placeholder="Ürün hakkında kısa bir açıklama veya AI ile oluşturun..."
                       {...field}
                     />
                   </FormControl>
@@ -247,11 +300,11 @@ export default function AddMenuItemPage() {
                 type="button"
                 variant="outline"
                 onClick={() => router.back()}
-                disabled={loading || isCompressing}
+                disabled={loading || isCompressing || isAiLoading}
               >
                 İptal
               </Button>
-              <Button type="submit" disabled={loading || isCompressing || !imageFile && !!imagePreview}>
+              <Button type="submit" disabled={loading || isCompressing || !imageFile && !!imagePreview || isAiLoading}>
                 {(loading || isCompressing) && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 {isCompressing ? 'Resim Hazırlanıyor...' : loading ? 'Kaydediliyor...' : 'Kaydet'}
               </Button>

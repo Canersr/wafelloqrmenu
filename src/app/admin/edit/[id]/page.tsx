@@ -34,10 +34,11 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { useEffect, useState } from 'react';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Sparkles } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import Image from 'next/image';
 import { compressImage } from '@/lib/image-compressor';
+import { generateDescription } from '@/ai/flows/generate-description';
 
 const categories = [
   'Klasik Waffle',
@@ -61,6 +62,7 @@ export default function EditMenuItemPage() {
   const { toast } = useToast();
   const itemId = params.id as string;
   const [loading, setLoading] = useState(false);
+  const [isAiLoading, setIsAiLoading] = useState(false);
   const [isCompressing, setIsCompressing] = useState(false);
   const [fetching, setFetching] = useState(true);
   const [item, setItem] = useState<MenuItem | null>(null);
@@ -129,6 +131,39 @@ export default function EditMenuItemPage() {
       } finally {
         setIsCompressing(false);
       }
+    }
+  };
+
+  const handleGenerateDescription = async () => {
+    const productName = form.getValues('name');
+    const category = form.getValues('category');
+
+    if (!productName || !category) {
+      toast({
+        title: 'Eksik Bilgi',
+        description: 'Lütfen önce ürün adını ve kategorisini doldurun.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    setIsAiLoading(true);
+    try {
+      const result = await generateDescription({ productName, category });
+      form.setValue('description', result.description, { shouldValidate: true });
+      toast({
+        title: 'Başarılı!',
+        description: 'Yapay zeka açıklamayı oluşturdu.',
+      });
+    } catch (error) {
+      console.error('AI description error:', error);
+      toast({
+        title: 'Yapay Zeka Hatası',
+        description: 'Açıklama oluşturulurken bir hata oluştu.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsAiLoading(false);
     }
   };
   
@@ -270,10 +305,27 @@ export default function EditMenuItemPage() {
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Açıklama</FormLabel>
+                  <div className="flex justify-between items-center">
+                    <FormLabel>Açıklama</FormLabel>
+                     <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={handleGenerateDescription}
+                        disabled={isAiLoading}
+                        className="text-xs"
+                      >
+                        {isAiLoading ? (
+                          <Loader2 className="mr-2 h-3 w-3 animate-spin" />
+                        ) : (
+                          <Sparkles className="mr-2 h-3 w-3" />
+                        )}
+                        AI ile Oluştur
+                      </Button>
+                  </div>
                   <FormControl>
                     <Textarea
-                      placeholder="Ürün hakkında kısa bir açıklama..."
+                      placeholder="Ürün hakkında kısa bir açıklama veya AI ile oluşturun..."
                       {...field}
                     />
                   </FormControl>
@@ -318,11 +370,11 @@ export default function EditMenuItemPage() {
                 type="button"
                 variant="outline"
                 onClick={() => router.back()}
-                disabled={loading || isCompressing}
+                disabled={loading || isCompressing || isAiLoading}
               >
                 İptal
               </Button>
-              <Button type="submit" disabled={loading || isCompressing}>
+              <Button type="submit" disabled={loading || isCompressing || isAiLoading}>
                 {(loading || isCompressing) && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 {isCompressing ? 'Resim Hazırlanıyor...' : loading ? 'Güncelleniyor...' : 'Güncelle'}
               </Button>
