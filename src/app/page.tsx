@@ -14,7 +14,7 @@ import {
 
 export default function HomePage() {
   const address = 'Sinan mh 1254.sk Aras Bedesteni İşhanı no 18D, Muratpaşa/Antalya';
-  const googleMapsEmbedUrl = `https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3191.0425317769913!2d30.70799697648939!3d36.88938996417546!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x14c39178d4924c8b%3A0xc3c54be5f1428a2!2sAras%20Bedesteni%20%C4%B0%C5%9Fhan%C4%B1!5e0!3m2!1str!2str!4v1752200067098!5m2!1str!2str`;
+  const googleMapsEmbedUrl = `https://maps.google.com/maps?q=Sinan%20mh%201254.sk%20Aras%20Bedesteni%20%C4%B0%C5%9Fhan%C4%B1%20no%2018D%2C%20Muratpa%C5%9Fa%2FAntalya&t=&z=17&ie=UTF8&iwloc=&output=embed`;
 
   return (
     <div className="flex flex-col min-h-dvh bg-background text-foreground font-body">
