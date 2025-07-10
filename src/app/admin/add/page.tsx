@@ -94,7 +94,7 @@ export default function AddMenuItemPage() {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setLoading(true);
-    let imageUrl = 'https://placehold.co/600x400.png';
+    let imageUrl = 'https://res.cloudinary.com/demo/image/upload/sample.jpg';
 
     try {
       if (imageFile) {
