@@ -31,7 +31,7 @@ export default function HomePage() {
         
         <div className="mt-10 flex flex-col gap-3 w-full max-w-xs">
           <Button asChild size="lg" className="h-14 text-lg font-semibold rounded-full bg-primary hover:bg-primary/90 text-primary-foreground">
-            <Link href="/menu">Menüyü Görüntüle</Link>
+            <Link href="/menu" prefetch={true}>Menüyü Görüntüle</Link>
           </Button>
           <div className="grid grid-cols-2 gap-3">
             <Button variant="outline" size="lg" className="h-14 text-lg font-semibold rounded-full border-2 border-primary text-primary bg-background hover:bg-primary/10">
