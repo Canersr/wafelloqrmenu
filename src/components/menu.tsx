@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useRef, useEffect } from 'react';
 import type { MenuItem } from '@/types';
 import { MenuItemCard } from '@/components/menu-item-card';
 import { Button } from '@/components/ui/button';
@@ -16,6 +16,7 @@ type Category = 'Tümü' | MenuItem['category'];
 
 export function Menu({ menuItems }: MenuProps) {
   const [selectedCategory, setSelectedCategory] = useState<Category>('Tümü');
+  const buttonRefs = useRef<Record<string, HTMLButtonElement | null>>({});
 
   const categories = useMemo(() => {
     const uniqueCategories: Category[] = ['Tümü', 'Klasik Waffle', 'Meyveli Waffle', 'Çikolatalı Lezzetler', 'İçecekler'];
@@ -29,6 +30,15 @@ export function Menu({ menuItems }: MenuProps) {
     return menuItems.filter((item) => item.category === selectedCategory);
   }, [menuItems, selectedCategory]);
 
+  const handleCategoryClick = (category: Category) => {
+    setSelectedCategory(category);
+    const button = buttonRefs.current[category];
+    if (button) {
+      button.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+    }
+  };
+
+
   return (
     <section id="menu" className="-mt-8 relative z-10">
         <div className="container mx-auto px-4">
@@ -36,17 +46,18 @@ export function Menu({ menuItems }: MenuProps) {
               <div className="flex w-max space-x-2 pb-4">
                 {categories.map((category) => (
                     <Button
-                    key={category}
-                    onClick={() => setSelectedCategory(category)}
-                    variant="ghost"
-                    className={cn(
-                        "rounded-full px-6 transition-colors duration-300 font-semibold",
-                        selectedCategory === category
-                        ? "bg-primary text-primary-foreground hover:bg-primary/90"
-                        : "bg-card text-card-foreground hover:bg-card/80"
-                    )}
+                      key={category}
+                      ref={(el) => (buttonRefs.current[category] = el)}
+                      onClick={() => handleCategoryClick(category)}
+                      variant="ghost"
+                      className={cn(
+                          "rounded-full px-6 transition-colors duration-300 font-semibold",
+                          selectedCategory === category
+                          ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                          : "bg-card text-card-foreground hover:bg-card/80"
+                      )}
                     >
-                    {category}
+                      {category}
                     </Button>
                 ))}
               </div>
