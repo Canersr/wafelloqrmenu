@@ -19,13 +19,13 @@ export default function HomePage() {
         </div>
       </header>
       
-      <main className="flex-1 flex flex-col items-center justify-center text-center px-4">
-        <div className="mb-4">
+      <main className="flex-1 flex flex-col items-center justify-center text-center px-4 -mt-8">
+        <div className="mb-2">
           <WaffleLogo className="w-56 h-56 sm:w-64 sm:h-64" />
         </div>
 
-        <h1 className="text-5xl sm:text-6xl font-bold font-headline text-primary tracking-tight mb-8">
-            WAFELLO
+        <h1 className="text-6xl sm:text-7xl font-handwriting text-primary tracking-tight mb-8">
+            Wafello
         </h1>
         
         <div className="flex flex-col gap-4 w-full max-w-xs">

@@ -12,6 +12,7 @@ export default {
       fontFamily: {
         body: ['var(--font-fredoka)', 'sans-serif'],
         headline: ['var(--font-fredoka)', 'sans-serif'],
+        handwriting: ['var(--font-pacifico)', 'cursive'],
         code: ['monospace'],
       },
       colors: {

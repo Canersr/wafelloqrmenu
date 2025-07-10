@@ -1,5 +1,5 @@
 import type {Metadata} from 'next';
-import { Fredoka } from 'next/font/google';
+import { Fredoka, Pacifico } from 'next/font/google';
 import { Toaster } from "@/components/ui/toaster"
 import './globals.css';
 
@@ -8,6 +8,13 @@ const fredoka = Fredoka({
   weight: ['400', '500', '600', '700'],
   display: 'swap',
   variable: '--font-fredoka' 
+});
+
+const pacifico = Pacifico({
+  subsets: ['latin'],
+  weight: ['400'],
+  display: 'swap',
+  variable: '--font-pacifico'
 });
 
 export const metadata: Metadata = {
@@ -23,7 +30,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head />
-      <body className={`${fredoka.variable} font-body antialiased`}>
+      <body className={`${fredoka.variable} ${pacifico.variable} font-body antialiased`}>
         {children}
         <Toaster />
       </body>
