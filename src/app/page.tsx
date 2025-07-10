@@ -85,17 +85,7 @@ export default function HomePage() {
 
   return (
     <div className="flex flex-col min-h-dvh bg-background text-foreground font-body">
-      <header className="w-full">
-        <div className="container mx-auto flex justify-center items-center p-4 text-sm">
-          <a
-            href="tel:+905377914662"
-            className="flex items-center gap-2 hover:text-primary transition-colors"
-          >
-            <Phone size={16} />
-            +90 537 791 46 62
-          </a>
-        </div>
-      </header>
+      <header className="w-full py-4"></header>
 
       <main className="flex-1 flex flex-col items-center justify-center text-center px-4 -mt-8">
         <div>
@@ -227,17 +217,28 @@ export default function HomePage() {
       </main>
 
       <footer className="w-full py-6 text-center">
-        <div className="flex flex-col items-center gap-2">
-          <Button
-            variant="ghost"
-            asChild
-            className="rounded-full w-12 h-12 border border-muted hover:bg-muted/50"
-          >
-            <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
-              <Instagram className="text-muted-foreground" />
-            </a>
-          </Button>
-          <p className="text-sm text-muted-foreground mt-2">Wafello © 2024</p>
+        <div className="flex flex-col items-center gap-4">
+          <div className="flex items-center gap-4">
+             <Button
+                variant="ghost"
+                asChild
+                className="rounded-full w-12 h-12 border border-muted hover:bg-muted/50"
+              >
+                <a href="tel:+905377914662" aria-label="Telefon">
+                  <Phone className="text-muted-foreground" />
+                </a>
+              </Button>
+            <Button
+              variant="ghost"
+              asChild
+              className="rounded-full w-12 h-12 border border-muted hover:bg-muted/50"
+            >
+              <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+                <Instagram className="text-muted-foreground" />
+              </a>
+            </Button>
+          </div>
+          <p className="text-sm text-muted-foreground">Wafello © 2024</p>
         </div>
       </footer>
     </div>
