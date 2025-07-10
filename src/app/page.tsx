@@ -24,7 +24,7 @@ export default function HomePage() {
           <WaffleLogo className="w-56 h-56 sm:w-64 sm:h-64" />
         </div>
 
-        <h1 className="text-6xl sm:text-7xl font-handwriting text-primary tracking-tight mb-8">
+        <h1 className="text-6xl sm:text-7xl font-handwriting text-primary tracking-tight mb-8 -mt-8">
             Wafello
         </h1>
         
