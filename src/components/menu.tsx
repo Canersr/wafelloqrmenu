@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState, useRef, useEffect } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import type { MenuItem } from '@/types';
 import { MenuItemCard } from '@/components/menu-item-card';
 import { Button } from '@/components/ui/button';
@@ -61,7 +61,7 @@ export function Menu({ menuItems }: MenuProps) {
       <div className="container mx-auto px-4">
         <Carousel setApi={setApi} opts={{ align: 'start', dragFree: true }} className="w-full mb-8">
           <CarouselContent className="-ml-2">
-            {categories.map((category, index) => (
+            {categories.map((category) => (
               <CarouselItem key={category} className="pl-2 basis-auto">
                 <Button
                   onClick={() => handleCategoryClick(category)}
