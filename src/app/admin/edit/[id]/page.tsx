@@ -208,8 +208,8 @@ export default function EditMenuItemPage() {
         });
         
         if (!res.ok) {
-            const errorData = await res.json();
-            console.error('Cloudinary upload error:', errorData);
+            const errorText = await res.text();
+            console.error('Cloudinary upload error:', errorText);
             throw new Error('Resim yüklemesi başarısız oldu.');
         }
         
