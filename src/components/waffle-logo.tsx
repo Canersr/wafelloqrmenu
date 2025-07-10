@@ -3,8 +3,7 @@ import type { HTMLAttributes } from 'react';
 import { cn } from '@/lib/utils';
 
 export function WaffleLogo({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
-  // Reverted to the original URL to ensure the logo is visible.
-  const logoUrl = "https://res.cloudinary.com/dxwwviisy/image/upload/v1752131673/wafello_logo_swjlyq.jpg";
+  const logoUrl = "https://res.cloudinary.com/dxwwviisy/image/upload/v1752132024/wafello_logo-removebg-preview_n1nuzn.png";
   
   return (
     <div className={cn("relative", className)} {...props}>
