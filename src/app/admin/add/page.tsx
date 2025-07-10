@@ -168,7 +168,7 @@ export default function AddMenuItemPage() {
     try {
         const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
         const uploadPreset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
-
+        
         if (!cloudName || !uploadPreset) {
             throw new Error('Cloudinary environment variables are not configured.');
         }
@@ -209,7 +209,7 @@ export default function AddMenuItemPage() {
         let description = 'Ürün eklenirken bir hata oluştu.';
         if (error.message.includes('Cloudinary environment variables')) {
           description = 'Cloudinary ayarları eksik. Lütfen .env dosyasını kontrol edin.';
-        } else if (error.message.includes('Resim yüklemesi')) {
+        } else if (error.message.includes('Resim yüklemesi başarısız oldu')) {
           description = 'Resim yüklenemedi. Lütfen Cloudinary ayarlarınızı ve internet bağlantınızı kontrol edin.';
         } else if (error.code === 'permission-denied') {
           description = 'Veritabanına yazma izniniz yok. Lütfen Firebase kurallarınızı kontrol edin.';
