@@ -1,6 +1,6 @@
 export type MenuItem = {
   id: string;
-  category: 'Klasik Waffle' | 'Meyveli Waffle' | 'Çikolatalı Lezzetler' | 'İçecekler';
+  category: string;
   name: string;
   description: string;
   price: number;

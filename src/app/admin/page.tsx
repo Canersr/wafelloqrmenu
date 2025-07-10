@@ -22,7 +22,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { PlusCircle, Edit, Trash2, Loader2, Database } from 'lucide-react';
+import { PlusCircle, Edit, Trash2, Loader2, Database, LayoutGrid } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import {
   AlertDialog,
@@ -144,12 +144,20 @@ export default function AdminDashboard() {
             Menünüzdeki ürünleri görüntüleyin, düzenleyin veya silin.
           </CardDescription>
         </div>
-        <Button asChild>
-          <Link href="/admin/add">
-            <PlusCircle className="mr-2 h-4 w-4" />
-            Yeni Ürün Ekle
-          </Link>
-        </Button>
+        <div className="flex items-center gap-2">
+           <Button asChild variant="outline">
+            <Link href="/admin/categories">
+              <LayoutGrid className="mr-2 h-4 w-4" />
+              Kategorileri Yönet
+            </Link>
+          </Button>
+          <Button asChild>
+            <Link href="/admin/add">
+              <PlusCircle className="mr-2 h-4 w-4" />
+              Yeni Ürün Ekle
+            </Link>
+          </Button>
+        </div>
       </CardHeader>
       <CardContent>
         <div className="border rounded-md">

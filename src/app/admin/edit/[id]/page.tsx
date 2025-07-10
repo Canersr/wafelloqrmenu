@@ -4,7 +4,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { doc, getDoc, updateDoc, collection, getDocs, query, orderBy } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import type { MenuItem } from '@/types';
 import { Button } from '@/components/ui/button';
@@ -40,16 +40,9 @@ import Image from 'next/image';
 import { compressImage } from '@/lib/image-compressor';
 import { generateDescription } from '@/ai/flows/generate-description';
 
-const categories = [
-  'Klasik Waffle',
-  'Meyveli Waffle',
-  'Çikolatalı Lezzetler',
-  'İçecekler',
-];
-
 const formSchema = z.object({
   name: z.string().min(2, 'İsim en az 2 karakter olmalıdır.'),
-  category: z.enum([...categories] as [string, ...string[]], {
+  category: z.string({
     required_error: 'Lütfen bir kategori seçin.',
   }),
   description: z.string().min(10, 'Açıklama en az 10 karakter olmalıdır.'),
@@ -68,10 +61,33 @@ export default function EditMenuItemPage() {
   const [item, setItem] = useState<MenuItem | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [categories, setCategories] = useState<string[]>([]);
+  const [isCategoriesLoading, setIsCategoriesLoading] = useState(true);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
   });
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const categoriesCollection = collection(db, 'categories');
+        const q = query(categoriesCollection, orderBy('name'));
+        const querySnapshot = await getDocs(q);
+        setCategories(querySnapshot.docs.map(doc => doc.data().name));
+      } catch (error) {
+        toast({
+            title: 'Hata',
+            description: 'Kategoriler yüklenirken bir sorun oluştu.',
+            variant: 'destructive',
+        });
+        console.error("Error fetching categories: ", error);
+      } finally {
+        setIsCategoriesLoading(false);
+      }
+    };
+    fetchCategories();
+  }, [toast]);
 
   useEffect(() => {
     if (!itemId) return;
@@ -282,10 +298,11 @@ export default function EditMenuItemPage() {
                   <Select
                     onValueChange={field.onChange}
                     defaultValue={field.value}
+                    disabled={isCategoriesLoading || categories.length === 0}
                   >
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="Bir kategori seçin" />
+                        <SelectValue placeholder={isCategoriesLoading ? "Kategoriler yükleniyor..." : "Bir kategori seçin"} />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>

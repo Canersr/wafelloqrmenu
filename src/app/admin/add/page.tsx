@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { collection, addDoc } from 'firebase/firestore';
+import { collection, addDoc, getDocs, orderBy, query } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { Button } from '@/components/ui/button';
 import {
@@ -33,21 +33,14 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, Sparkles } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { compressImage } from '@/lib/image-compressor';
 import { generateDescription } from '@/ai/flows/generate-description';
 
-const categories = [
-  'Klasik Waffle',
-  'Meyveli Waffle',
-  'Çikolatalı Lezzetler',
-  'İçecekler',
-];
-
 const formSchema = z.object({
   name: z.string().min(2, 'İsim en az 2 karakter olmalıdır.'),
-  category: z.enum([...categories] as [string, ...string[]], {
+  category: z.string({
     required_error: 'Lütfen bir kategori seçin.',
   }),
   description: z.string().min(10, 'Açıklama en az 10 karakter olmalıdır.'),
@@ -62,6 +55,8 @@ export default function AddMenuItemPage() {
   const [isCompressing, setIsCompressing] = useState(false);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [categories, setCategories] = useState<string[]>([]);
+  const [isCategoriesLoading, setIsCategoriesLoading] = useState(true);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -71,6 +66,35 @@ export default function AddMenuItemPage() {
       price: 0,
     },
   });
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const categoriesCollection = collection(db, 'categories');
+        const q = query(categoriesCollection, orderBy('name'));
+        const querySnapshot = await getDocs(q);
+        const fetchedCategories = querySnapshot.docs.map(doc => doc.data().name);
+        setCategories(fetchedCategories);
+         if (fetchedCategories.length === 0) {
+            toast({
+                title: 'Uyarı',
+                description: 'Hiç kategori bulunamadı. Lütfen önce bir kategori ekleyin.',
+                variant: 'destructive',
+            });
+        }
+      } catch (error) {
+        toast({
+            title: 'Hata',
+            description: 'Kategoriler yüklenirken bir sorun oluştu.',
+            variant: 'destructive',
+        });
+        console.error("Error fetching categories: ", error);
+      } finally {
+        setIsCategoriesLoading(false);
+      }
+    };
+    fetchCategories();
+  }, [toast]);
   
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -212,10 +236,11 @@ export default function AddMenuItemPage() {
                   <Select
                     onValueChange={field.onChange}
                     defaultValue={field.value}
+                    disabled={isCategoriesLoading || categories.length === 0}
                   >
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="Bir kategori seçin" />
+                        <SelectValue placeholder={isCategoriesLoading ? "Kategoriler yükleniyor..." : "Bir kategori seçin"} />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
@@ -304,7 +329,7 @@ export default function AddMenuItemPage() {
               >
                 İptal
               </Button>
-              <Button type="submit" disabled={loading || isCompressing || !imageFile && !!imagePreview || isAiLoading}>
+              <Button type="submit" disabled={loading || isCompressing || !imageFile && !!imagePreview || isAiLoading || isCategoriesLoading || categories.length === 0}>
                 {(loading || isCompressing) && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 {isCompressing ? 'Resim Hazırlanıyor...' : loading ? 'Kaydediliyor...' : 'Kaydet'}
               </Button>
