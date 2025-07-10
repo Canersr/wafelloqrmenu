@@ -86,24 +86,13 @@ export default function HomePage() {
   return (
     <div className="flex flex-col min-h-dvh bg-background text-foreground font-body">
       <header className="w-full">
-        <div className="container mx-auto flex justify-between items-start p-4 text-sm">
+        <div className="container mx-auto flex justify-center items-center p-4 text-sm">
           <a
             href="tel:+905377914662"
             className="flex items-center gap-2 hover:text-primary transition-colors"
           >
             <Phone size={16} />
             +90 537 791 46 62
-          </a>
-          <a
-            href={googleMapsUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-start gap-2 hover:text-primary transition-colors"
-          >
-            <MapPin size={16} className="mt-0.5 shrink-0" />
-            <p className="max-w-[150px] sm:max-w-xs text-right">
-              {address}
-            </p>
           </a>
         </div>
       </header>
