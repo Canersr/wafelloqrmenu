@@ -2,9 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { collection, onSnapshot, doc, deleteDoc, query, orderBy } from 'firebase/firestore';
+import { collection, onSnapshot, doc, deleteDoc, query, orderBy, addDoc, getDocs } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import type { MenuItem } from '@/types';
+import { menuItems as sampleMenuItems } from '@/lib/data';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -21,7 +22,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { PlusCircle, Edit, Trash2, Loader2 } from 'lucide-react';
+import { PlusCircle, Edit, Trash2, Loader2, Database } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import {
   AlertDialog,
@@ -39,6 +40,7 @@ export default function AdminDashboard() {
   const { toast } = useToast();
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isSeeding, setIsSeeding] = useState(false);
   const [dbError, setDbError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -70,6 +72,46 @@ export default function AdminDashboard() {
 
     return () => unsubscribe();
   }, [toast]);
+
+  const handleSeedDatabase = async () => {
+    setIsSeeding(true);
+    try {
+      // Prevent seeding if items already exist
+      if (menuItems.length > 0) {
+        toast({
+          title: "Uyarı",
+          description: "Veritabanı zaten dolu. Bu işlem yapılamaz.",
+          variant: 'default',
+        });
+        return;
+      }
+      
+      const menuItemsCollection = collection(db, 'menuItems');
+      for (const item of sampleMenuItems) {
+        await addDoc(menuItemsCollection, item);
+      }
+      
+      toast({
+        title: 'Başarılı!',
+        description: 'Örnek ürünler veritabanına başarıyla eklendi.',
+        variant: 'default',
+      });
+    } catch (error: any) {
+      console.error("Veritabanı doldurma hatası: ", error);
+      let description = 'Örnek ürünler eklenirken bir hata oluştu.';
+       if (error.code === 'permission-denied') {
+        description = 'Veritabanına yazma izniniz yok gibi görünüyor. Lütfen Firebase konsolundaki güvenlik kurallarınızı kontrol edin.';
+      }
+      toast({
+        title: 'Hata!',
+        description: description,
+        variant: 'destructive',
+      });
+    } finally {
+      setIsSeeding(false);
+    }
+  };
+
 
   const handleDelete = async (item: MenuItem) => {
     try {
@@ -136,7 +178,17 @@ export default function AdminDashboard() {
               ) : menuItems.length === 0 ? (
                  <TableRow>
                   <TableCell colSpan={4} className="text-center h-24 text-muted-foreground">
-                    Veritabanında hiç ürün bulunamadı. Başlamak için "Yeni Ürün Ekle" butonuna tıklayın.
+                    <div className="flex flex-col items-center gap-4">
+                        <span>Veritabanında hiç ürün bulunamadı.</span>
+                        <Button onClick={handleSeedDatabase} disabled={isSeeding}>
+                            {isSeeding ? (
+                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            ) : (
+                                <Database className="mr-2 h-4 w-4" />
+                            )}
+                            {isSeeding ? 'Yükleniyor...' : 'Örnek Ürünleri Yükle'}
+                        </Button>
+                    </div>
                   </TableCell>
                 </TableRow>
               ) : (
