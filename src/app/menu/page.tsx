@@ -1,47 +1,57 @@
-'use client';
+'use server';
 
-import { useEffect, useState } from 'react';
 import { collection, getDocs, orderBy, query } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import type { MenuItem } from '@/types';
 import { MenuHeader } from '@/components/menu-header';
 import { Menu } from '@/components/menu';
-import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
 
-export default function MenuPage() {
-  const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
-  const [loading, setLoading] = useState(true);
+async function getMenuItems(): Promise<MenuItem[]> {
+  try {
+    const menuItemsCollection = collection(db, 'menuItems');
+    const q = query(menuItemsCollection, orderBy('name'));
+    const querySnapshot = await getDocs(q);
+    const items = querySnapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    })) as MenuItem[];
+    return items;
+  } catch (error) {
+    console.error("Error fetching menu items: ", error);
+    // Hata durumunda boş bir dizi döndürüyoruz ki sayfa bozulmasın.
+    return [];
+  }
+}
 
-  useEffect(() => {
-    const fetchMenuItems = async () => {
-      setLoading(true);
-      try {
-        const menuItemsCollection = collection(db, 'menuItems');
-        const q = query(menuItemsCollection, orderBy('name'));
-        const querySnapshot = await getDocs(q);
-        const items = querySnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        })) as MenuItem[];
-        setMenuItems(items);
-      } catch (error) {
-        console.error("Error fetching menu items: ", error);
-        // Hata durumunda toast mesajı gösterilebilir
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchMenuItems();
-  }, []);
+export default async function MenuPage() {
+  const menuItems = await getMenuItems();
 
   return (
     <div className="flex flex-col min-h-dvh bg-background">
       <MenuHeader />
       <main className="flex-1 py-12">
-        {loading ? (
-          <div className="container mx-auto px-4">
+        {menuItems.length === 0 ? (
+            <div className="container mx-auto px-4 text-center">
+                <p className="text-muted-foreground">Menüde gösterilecek ürün bulunamadı. Lütfen yönetim panelinden ürün ekleyin.</p>
+            </div>
+        ) : (
+          <Menu menuItems={menuItems} />
+        )}
+      </main>
+    </div>
+  );
+}
+
+// Yükleme durumunu göstermek için React Suspense ile kullanılabilen bir yedek bileşen.
+// Next.js bunu otomatik olarak algılayıp kullanabilir.
+export function Loading() {
+ return (
+    <div className="flex flex-col min-h-dvh bg-background">
+      <MenuHeader />
+      <main className="flex-1 py-12">
+        <div className="container mx-auto px-4">
              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {[...Array(6)].map((_, i) => (
                 <Card key={i} className="overflow-hidden shadow-lg flex flex-col h-full bg-card border-none rounded-xl">
@@ -62,13 +72,6 @@ export default function MenuPage() {
               ))}
             </div>
           </div>
-        ) : menuItems.length === 0 ? (
-            <div className="container mx-auto px-4 text-center">
-                <p className="text-muted-foreground">Menüde gösterilecek ürün bulunamadı. Lütfen yönetim panelinden ürün ekleyin.</p>
-            </div>
-        ) : (
-          <Menu menuItems={menuItems} />
-        )}
       </main>
     </div>
   );
