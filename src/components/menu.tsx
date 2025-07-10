@@ -22,6 +22,9 @@ type Category = 'Tümü' | MenuItem['category'];
 
 export function Menu({ menuItems }: MenuProps) {
   const [api, setApi] = useState<CarouselApi>();
+  const [canScrollPrev, setCanScrollPrev] = useState(false);
+  const [canScrollNext, setCanScrollNext] = useState(false);
+
   const [selectedCategory, setSelectedCategory] = useState<Category>('Tümü');
 
   const categories = useMemo(() => {
@@ -34,6 +37,28 @@ export function Menu({ menuItems }: MenuProps) {
     ];
     return uniqueCategories;
   }, []);
+
+  useEffect(() => {
+    if (!api) {
+      return;
+    }
+
+    const onSelect = (api: CarouselApi) => {
+        setCanScrollPrev(api.canScrollPrev());
+        setCanScrollNext(api.canScrollNext());
+    };
+
+    api.on("select", onSelect);
+    api.on("reInit", onSelect);
+
+    // Initial check
+    onSelect(api);
+
+    return () => {
+      api.off("select", onSelect);
+      api.off("reInit", onSelect);
+    };
+  }, [api]);
 
   useEffect(() => {
     if (!api) {
@@ -61,32 +86,34 @@ export function Menu({ menuItems }: MenuProps) {
       <div className="container mx-auto px-4">
         <Carousel 
           setApi={setApi} 
-          opts={{ align: 'start', draggable: false }} 
+          opts={{ align: 'start', slidesToScroll: 1, draggable: false }} 
           className="w-full mb-8"
         >
-          <CarouselContent className="-ml-2">
-            {categories.map((category, index) => (
-              <CarouselItem key={category} className="pl-2 basis-auto">
-                <Button
-                  onClick={() => {
-                    handleCategoryClick(category);
-                    api?.scrollTo(index);
-                  }}
-                  variant="ghost"
-                  className={cn(
-                    'rounded-full px-6 transition-colors duration-300 font-semibold',
-                    selectedCategory === category
-                      ? 'bg-primary text-primary-foreground hover:bg-primary/90'
-                      : 'bg-card text-card-foreground hover:bg-card/80'
-                  )}
-                >
-                  {category}
-                </Button>
-              </CarouselItem>
-            ))}
-          </CarouselContent>
-          <CarouselPrevious className="absolute left-[-1.5rem]"/>
-          <CarouselNext className="absolute right-[-1.5rem]" />
+          <div className="relative">
+            <CarouselContent className="-ml-2">
+              {categories.map((category, index) => (
+                <CarouselItem key={category} className="pl-2 basis-auto">
+                  <Button
+                    onClick={() => {
+                      handleCategoryClick(category);
+                      api?.scrollTo(index);
+                    }}
+                    variant="ghost"
+                    className={cn(
+                      'rounded-full px-6 transition-colors duration-300 font-semibold',
+                      selectedCategory === category
+                        ? 'bg-primary text-primary-foreground hover:bg-primary/90'
+                        : 'bg-card text-card-foreground hover:bg-card/80'
+                    )}
+                  >
+                    {category}
+                  </Button>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            {canScrollPrev && <CarouselPrevious className="absolute left-[-1.5rem]"/>}
+            {canScrollNext && <CarouselNext className="absolute right-[-1.5rem]" />}
+          </div>
         </Carousel>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
