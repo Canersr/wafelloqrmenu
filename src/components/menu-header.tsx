@@ -16,7 +16,7 @@ export function MenuHeader() {
           data-ai-hint="cafe interior"
           priority
         />
-        <div className="absolute inset-0 bg-black/50" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/40 to-transparent" />
       </div>
       
       <div className="container mx-auto px-4 relative h-full flex flex-col justify-center items-center text-center">
@@ -25,8 +25,11 @@ export function MenuHeader() {
             <ChevronLeft className="h-6 w-6" />
           </Button>
         </Link>
-        <div className="flex flex-col items-center gap-2 text-white">
-          <WaffleLogo className="w-32 h-32" />
+        <div className="flex items-center justify-center gap-4 text-white">
+          <WaffleLogo className="w-24 h-24" />
+          <h1 className="text-5xl sm:text-6xl font-handwriting text-primary drop-shadow-lg" style={{textShadow: '2px 2px 4px rgba(0,0,0,0.5)'}}>
+            Wafello
+          </h1>
         </div>
       </div>
     </header>
