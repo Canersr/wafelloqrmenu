@@ -8,9 +8,8 @@ export function WaffleLogo({ className, ...props }: HTMLAttributes<HTMLDivElemen
         <Image
           src="https://res.cloudinary.com/dxwwviisy/image/upload/v1752131673/wafello_logo_swjlyq.jpg"
           alt="Wafello Logo"
-          width={160}
-          height={160}
-          className="rounded-full"
+          fill
+          className="object-contain"
           priority
         />
     </div>

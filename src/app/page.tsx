@@ -20,11 +20,11 @@ export default function HomePage() {
       </header>
       
       <main className="flex-1 flex flex-col items-center justify-center text-center px-4">
-        <div className="mb-4">
+        <div className="mb-8">
           <WaffleLogo className="w-48 h-48 sm:w-56 sm:h-56" />
         </div>
         
-        <div className="mt-8 flex flex-col gap-4 w-full max-w-xs">
+        <div className="mt-4 flex flex-col gap-4 w-full max-w-xs">
           <Button asChild size="lg" className="h-16 text-xl font-bold rounded-full bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg transform hover:scale-105 transition-transform duration-300">
             <Link href="/menu" prefetch={true}>Menüyü Görüntüle</Link>
           </Button>

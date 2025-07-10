@@ -26,7 +26,7 @@ export function MenuHeader() {
           </Button>
         </Link>
         <div className="flex flex-col items-center gap-2 text-white">
-          <WaffleLogo className="w-24 h-24" />
+          <WaffleLogo className="w-32 h-32" />
         </div>
       </div>
     </header>
