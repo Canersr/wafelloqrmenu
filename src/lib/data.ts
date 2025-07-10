@@ -1,14 +1,14 @@
 import type { MenuItem } from '@/types';
 
-// Bu dosya artık doğrudan kullanılmıyor.
-// Veriler Firebase Firestore'dan çekilmektedir.
-// Bu veriyi, veritabanınızı ilk kez doldurmak için referans olarak kullanabilirsiniz.
+// Bu dosya, veritabanınızı ilk kez doldurmak için bir referans olarak kullanılır.
+// Buradaki ürünleri, yönetim panelindeki "Yeni Ürün Ekle" sayfasını kullanarak
+// kopyala-yapıştır yöntemiyle kolayca ekleyebilirsiniz.
 export const menuItems: Omit<MenuItem, 'id'>[] = [
   // Klasik Waffle
   {
     category: 'Klasik Waffle',
     name: 'Belçika Usulü',
-    description: 'Pudra şekeri ve akçaağaç şurubu ile servis edilen klasik Belçika waffle.',
+    description: 'Pudra şekeri ve akçaağaç şurubu ile servis edilen geleneksel Belçika waffle.',
     price: 180.00,
     imageUrl: 'https://placehold.co/600x400.png',
     aiHint: 'belgian waffle',
@@ -16,25 +16,25 @@ export const menuItems: Omit<MenuItem, 'id'>[] = [
   // Meyveli Waffle
   {
     category: 'Meyveli Waffle',
-    name: 'Beyaz Büyü',
-    description: 'Beyaz çikolata, Hindistan cevizi, badem ve muz dilimleri.',
-    price: 255.00,
-    imageUrl: 'https://placehold.co/600x400.png',
-    aiHint: 'white chocolate',
-  },
-  {
-    category: 'Meyveli Waffle',
     name: 'Çilekli Rüyası',
-    description: 'Taze çilekler, cheesecake kreması ve bisküvi kırıntıları.',
+    description: 'Taze çilekler, çilek sosu, beyaz çikolata ve bisküvi kırıntıları.',
     price: 250.00,
     imageUrl: 'https://placehold.co/600x400.png',
     aiHint: 'strawberry waffle',
+  },
+  {
+    category: 'Meyveli Waffle',
+    name: 'Beyaz Büyü',
+    description: 'Beyaz çikolata, Hindistan cevizi, badem ve taze muz dilimleri.',
+    price: 255.00,
+    imageUrl: 'https://placehold.co/600x400.png',
+    aiHint: 'white chocolate banana',
   },
   // Çikolatalı Lezzetler
   {
     category: 'Çikolatalı Lezzetler',
     name: 'Çikolata Şelalesi',
-    description: 'Bol Nutella, beyaz çikolata sosu, fındık ve çikolata parçacıkları.',
+    description: 'Bol Nutella, sütlü çikolata, fındık ve çikolata parçacıkları.',
     price: 265.00,
     imageUrl: 'https://placehold.co/600x400.png',
     aiHint: 'chocolate waffle',
@@ -42,7 +42,7 @@ export const menuItems: Omit<MenuItem, 'id'>[] = [
   {
     category: 'Çikolatalı Lezzetler',
     name: 'Oreo Canavarı',
-    description: 'Oreo parçacıkları, beyaz çikolata sosu ve vanilyalı dondurma.',
+    description: 'Oreo parçacıkları, beyaz çikolata sosu ve bir top vanilyalı dondurma.',
     price: 280.00,
     imageUrl: 'https://placehold.co/600x400.png',
     aiHint: 'oreo waffle',
@@ -50,7 +50,7 @@ export const menuItems: Omit<MenuItem, 'id'>[] = [
   {
     category: 'Çikolatalı Lezzetler',
     name: 'Lotus Biscoff Keyfi',
-    description: 'Lotus Biscoff kreması, kırılmış Lotus bisküvileri ve bir top vanilyalı dondurma.',
+    description: 'Lotus kreması, kırılmış Lotus bisküvileri ve karamel sosu.',
     price: 245.00,
     imageUrl: 'https://placehold.co/600x400.png',
     aiHint: 'lotus waffle',
@@ -59,7 +59,7 @@ export const menuItems: Omit<MenuItem, 'id'>[] = [
   {
     category: 'İçecekler',
     name: 'Ev Yapımı Limonata',
-    description: 'Taze sıkılmış, ferahlatıcı limonata.',
+    description: 'Taze sıkılmış, nane yapraklarıyla ferahlatıcı ev yapımı limonata.',
     price: 90.00,
     imageUrl: 'https://placehold.co/600x400.png',
     aiHint: 'lemonade glass',
@@ -67,7 +67,7 @@ export const menuItems: Omit<MenuItem, 'id'>[] = [
   {
     category: 'İçecekler',
     name: 'Latte',
-    description: 'Espresso ve buharda ısıtılmış sütün mükemmel uyumu.',
+    description: 'Espresso ve buharda ısıtılmış sütün mükemmel uyumu. Sıcak veya soğuk servis edilir.',
     price: 80.00,
     imageUrl: 'https://placehold.co/600x400.png',
     aiHint: 'latte art',
@@ -75,17 +75,17 @@ export const menuItems: Omit<MenuItem, 'id'>[] = [
   {
     category: 'İçecekler',
     name: 'Sıcak Çikolata',
-    description: 'Yoğun ve kremalı sıcak çikolata.',
+    description: 'Yoğun Belçika çikolatası ve süt ile hazırlanan, üzeri kremalı sıcak çikolata.',
     price: 95.00,
     imageUrl: 'https://placehold.co/600x400.png',
-    aiHint: 'hot chocolate',
+    aiHint: 'hot chocolate mug',
   },
   {
     category: 'İçecekler',
     name: 'Filtre Kahve',
-    description: 'Taze demlenmiş, aromatik filtre kahve.',
+    description: 'Taze demlenmiş, aromatik Kolombiya çekirdeklerinden filtre kahve.',
     price: 70.00,
     imageUrl: 'https://placehold.co/600x400.png',
-    aiHint: 'filter coffee',
+    aiHint: 'filter coffee cup',
   },
 ];
