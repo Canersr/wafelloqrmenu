@@ -13,7 +13,7 @@ import {
 
 export default function HomePage() {
   const address = 'Sinan mh 1254.sk Aras Bedesteni İşhanı no 18D, Muratpaşa/Antalya';
-  const googleMapsEmbedUrl = `https://www.google.com/maps/embed/v1/place?key=${process.env.NEXT_PUBLIC_FIREBASE_API_KEY}&q=${encodeURIComponent(
+  const googleMapsEmbedUrl = `https://www.google.com/maps/embed/v1/place?q=${encodeURIComponent(
     address
   )}`;
 
