@@ -100,7 +100,7 @@ export default function HomePage() {
             rel="noopener noreferrer"
             className="flex items-start gap-2 text-right hover:text-primary transition-colors"
           >
-            <MapPin size={16} className="mt-0.5" />
+            <MapPin size={16} className="mt-0.5 shrink-0" />
             <p className="max-w-[150px] sm:max-w-xs text-right">
               {address}
             </p>
@@ -154,7 +154,7 @@ export default function HomePage() {
                     referrerPolicy="no-referrer-when-downgrade"
                     src={googleMapsEmbedUrl}
                   ></iframe>
-                  <a
+                   <a
                     href={googleMapsUrl}
                     target="_blank"
                     rel="noopener noreferrer"
