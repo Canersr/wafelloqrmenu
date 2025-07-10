@@ -199,7 +199,7 @@ export default function HomePage() {
                          </a>
                       </Button>
                        <Button variant="outline" asChild>
-                         <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" aria-label="Instagram'da Paylaş">
+                         <a href="https://www.instagram.com/wafelloantalya/" target="_blank" rel="noopener noreferrer" aria-label="Instagram'da bizi ziyaret et">
                            <Instagram /> Instagram
                          </a>
                       </Button>
@@ -233,7 +233,7 @@ export default function HomePage() {
               asChild
               className="rounded-full w-12 h-12 border border-muted hover:bg-muted/50"
             >
-              <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+              <a href="https://www.instagram.com/wafelloantalya/" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
                 <Instagram className="text-muted-foreground" />
               </a>
             </Button>
