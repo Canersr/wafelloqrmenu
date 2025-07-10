@@ -44,7 +44,7 @@ export default function HomePage() {
 
       <main className="flex-1 flex flex-col items-center justify-center text-center px-4 -mt-8">
         <div>
-          <WaffleLogo className="w-56 h-56 sm:w-64 sm:h-64 pointer-events-none" />
+          <WaffleLogo className="w-56 h-56 sm:w-64 sm:h-64" />
         </div>
 
         <h1 className="text-6xl sm:text-7xl font-handwriting text-primary tracking-tight mb-8 -mt-8">
