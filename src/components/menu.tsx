@@ -59,12 +59,19 @@ export function Menu({ menuItems }: MenuProps) {
   return (
     <section id="menu" className="-mt-8 relative z-10">
       <div className="container mx-auto px-4">
-        <Carousel setApi={setApi} opts={{ align: 'start', dragFree: true }} className="w-full mb-8">
+        <Carousel 
+          setApi={setApi} 
+          opts={{ align: 'start', draggable: false }} 
+          className="w-full mb-8"
+        >
           <CarouselContent className="-ml-2">
-            {categories.map((category) => (
+            {categories.map((category, index) => (
               <CarouselItem key={category} className="pl-2 basis-auto">
                 <Button
-                  onClick={() => handleCategoryClick(category)}
+                  onClick={() => {
+                    handleCategoryClick(category);
+                    api?.scrollTo(index);
+                  }}
                   variant="ghost"
                   className={cn(
                     'rounded-full px-6 transition-colors duration-300 font-semibold',
@@ -78,10 +85,8 @@ export function Menu({ menuItems }: MenuProps) {
               </CarouselItem>
             ))}
           </CarouselContent>
-          <div className="hidden md:block">
-            <CarouselPrevious className="absolute left-[-1.5rem]"/>
-            <CarouselNext className="absolute right-[-1.5rem]" />
-          </div>
+          <CarouselPrevious className="absolute left-[-1.5rem]"/>
+          <CarouselNext className="absolute right-[-1.5rem]" />
         </Carousel>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
