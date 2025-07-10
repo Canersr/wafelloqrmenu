@@ -31,7 +31,7 @@ type SocialPlatform = 'whatsapp' | 'twitter' | 'facebook';
 export default function HomePage() {
   const address = 'Sinan, 1254. Sk. No:18/D, 07170 Muratpaşa/Antalya';
   const encodedAddress = encodeURIComponent(address);
-  const googleMapsEmbedUrl = `https://maps.google.com/maps?q=${encodedAddress}&t=&z=17&ie=UTF8&iwloc=&output=embed`;
+  const googleMapsEmbedUrl = `https://www.google.com/maps/embed/v1/place?key=${process.env.NEXT_PUBLIC_FIREBASE_API_KEY}&q=${encodedAddress}`;
   const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodedAddress}`;
   const { toast } = useToast();
   const [siteUrl, setSiteUrl] = useState('');
@@ -242,7 +242,7 @@ export default function HomePage() {
             asChild
             className="rounded-full w-12 h-12 border border-muted hover:bg-muted/50"
           >
-            <a href="#" aria-label="Instagram">
+            <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
               <Instagram className="text-muted-foreground" />
             </a>
           </Button>
