@@ -10,6 +10,7 @@ import {
   Link as LinkIcon,
   Twitter,
   Facebook,
+  MessageCircle, // WhatsApp için yeni ikon
 } from 'lucide-react';
 import Link from 'next/link';
 import { WaffleLogo } from '@/components/waffle-logo';
@@ -81,10 +82,6 @@ export default function HomePage() {
         return `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`;
     }
   };
-
-  const WhatsappIcon = () => (
-    <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 fill-current"><title>WhatsApp</title><path d="M17.472 14.382c-.297-.149-.88-.436-1.017-.487-.137-.05-.274-.074-.412.074-.138.148-.533.614-.65.738-.118.123-.236.148-.412.05-.177-.1-.747-.274-1.424-.867-.528-.467-.88-.94-.988-1.115-.108-.174-.012-.268.06-.358.062-.08.137-.208.208-.282.07-.075.093-.124.137-.208.044-.083.022-.149-.012-.223-.034-.074-.412-.988-.56-.1352-.149-.364-.253-.314-.412-.314h-.38a.566.566 0 0 0-.583.533c-.001 1.05.38 1.957.435 2.108.056.15.88 1.413 2.13 1.957.288.123.517.187.693.248.33.117.636.1.88.074.288-.03.88-.364 1.002-.712.123-.348.123-.644.083-.712-.04-.07-.162-.117-.253-.162zM12.001 2.002a9.985 9.985 0 0 0-9.982 9.982c0 1.79.463 3.487 1.29 4.938L2.016 22l5.31-1.378a9.952 9.952 0 0 0 4.675 1.182h.004a9.985 9.985 0 0 0 9.982-9.983 9.985 9.985 0 0 0-9.982-9.982z"/></svg>
-  );
 
   return (
     <div className="flex flex-col min-h-dvh bg-background text-foreground font-body">
@@ -188,7 +185,7 @@ export default function HomePage() {
                 <DialogHeader>
                   <DialogTitle>Wafello'yu Paylaş</DialogTitle>
                   <DialogDescription>
-                    Bu QR kodu okutarak veya aşağıdaki linklerle arkadaşlarını davet et!
+                    Arkadaşlarını davet etmenin en kolay yolu!
                   </DialogDescription>
                 </DialogHeader>
                 <div className="flex flex-col items-center gap-6 py-4">
@@ -205,21 +202,26 @@ export default function HomePage() {
                     )}
                   </div>
                   <div className="w-full flex flex-col gap-3">
-                     <p className="text-sm text-center text-muted-foreground">- veya -</p>
-                    <div className="grid grid-cols-3 gap-2">
+                     <p className="text-sm text-center text-muted-foreground">- veya sosyal medyada paylaş -</p>
+                    <div className="grid grid-cols-2 gap-2">
                        <Button variant="outline" asChild>
                          <a href={getSocialShareLink('whatsapp', shareData.url, shareData.text)} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp'ta Paylaş">
-                            <WhatsappIcon />
+                            <MessageCircle /> WhatsApp
                          </a>
                       </Button>
                       <Button variant="outline" asChild>
                          <a href={getSocialShareLink('twitter', shareData.url, shareData.text)} target="_blank" rel="noopener noreferrer" aria-label="Twitter'da Paylaş">
-                           <Twitter />
+                           <Twitter /> Twitter
                          </a>
                       </Button>
                       <Button variant="outline" asChild>
                          <a href={getSocialShareLink('facebook', shareData.url, shareData.text)} target="_blank" rel="noopener noreferrer" aria-label="Facebook'ta Paylaş">
-                           <Facebook />
+                           <Facebook /> Facebook
+                         </a>
+                      </Button>
+                       <Button variant="outline" asChild>
+                         <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" aria-label="Instagram'da Paylaş">
+                           <Instagram /> Instagram
                          </a>
                       </Button>
                     </div>
