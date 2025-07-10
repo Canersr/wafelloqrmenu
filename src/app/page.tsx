@@ -20,20 +20,15 @@ export default function HomePage() {
       </header>
       
       <main className="flex-1 flex flex-col items-center justify-center text-center px-4">
-        <WaffleLogo className="w-36 h-36 sm:w-40 sm:h-40 mb-4" />
-        <h2 
-          className="text-7xl font-bold text-primary" 
-          style={{fontFamily: "'Fredoka', sans-serif", fontWeight: 700}}
-        >
-          Wafello
-        </h2>
-        <p className="text-muted-foreground text-lg mt-1">Tatlı Anların Buluşma Noktası</p>
+        <div className="mb-4">
+          <WaffleLogo className="w-48 h-48 sm:w-56 sm:h-56" />
+        </div>
         
-        <div className="mt-10 flex flex-col gap-3 w-full max-w-xs">
-          <Button asChild size="lg" className="h-14 text-lg font-semibold rounded-full bg-primary hover:bg-primary/90 text-primary-foreground">
+        <div className="mt-8 flex flex-col gap-4 w-full max-w-xs">
+          <Button asChild size="lg" className="h-16 text-xl font-bold rounded-full bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg transform hover:scale-105 transition-transform duration-300">
             <Link href="/menu" prefetch={true}>Menüyü Görüntüle</Link>
           </Button>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-4">
             <Button variant="outline" size="lg" className="h-14 text-lg font-semibold rounded-full border-2 border-primary text-primary bg-background hover:bg-primary/10">
               <MapPin className="mr-2 h-5 w-5"/>
               Konum

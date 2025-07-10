@@ -26,9 +26,7 @@ export function MenuHeader() {
           </Button>
         </Link>
         <div className="flex flex-col items-center gap-2 text-white">
-          <WaffleLogo className="w-20 h-20" />
-          <h1 className="text-4xl font-bold" style={{fontFamily: "'Fredoka', sans-serif", fontWeight: 700}}>Wafello</h1>
-          <p className="text-base text-white/80">Tatlı Anların Buluşma Noktası</p>
+          <WaffleLogo className="w-24 h-24" />
         </div>
       </div>
     </header>
