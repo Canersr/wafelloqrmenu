@@ -69,7 +69,7 @@ export function Menu({ menuItems }: MenuProps) {
     }
     const selectedIndex = categories.findIndex((c) => c === selectedCategory);
     if (selectedIndex !== -1) {
-      api.scrollTo(selectedIndex, true); // Instantly snap
+      api.scrollTo(selectedIndex); // Scroll with animation
     }
   }, [api, selectedCategory, categories]);
 
