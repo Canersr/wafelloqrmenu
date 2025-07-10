@@ -11,8 +11,9 @@ export function WaffleLogo({ className, ...props }: HTMLAttributes<HTMLDivElemen
           src={logoUrl}
           alt="Wafello Logo"
           fill
-          className="object-contain"
+          className="object-contain pointer-events-none"
           priority
+          draggable="false"
         />
     </div>
   );
