@@ -20,7 +20,7 @@ export default function HomePage() {
       </header>
       
       <main className="flex-1 flex flex-col items-center justify-center text-center px-4 -mt-8">
-        <div className="mb-2">
+        <div>
           <WaffleLogo className="w-56 h-56 sm:w-64 sm:h-64" />
         </div>
 
