@@ -98,7 +98,7 @@ export default function HomePage() {
             href={googleMapsUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-start gap-2 text-right hover:text-primary transition-colors"
+            className="flex items-start gap-2 hover:text-primary transition-colors"
           >
             <MapPin size={16} className="mt-0.5 shrink-0" />
             <p className="max-w-[150px] sm:max-w-xs text-right">
