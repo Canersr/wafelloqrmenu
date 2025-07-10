@@ -5,6 +5,8 @@ import type { MenuItem } from '@/types';
 import { MenuItemCard } from '@/components/menu-item-card';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
+
 
 interface MenuProps {
   menuItems: MenuItem[];
@@ -30,23 +32,26 @@ export function Menu({ menuItems }: MenuProps) {
   return (
     <section id="menu" className="-mt-8 relative z-10">
         <div className="container mx-auto px-4">
-            <div className="flex justify-center flex-wrap gap-2 mb-8">
-            {categories.map((category) => (
-                <Button
-                key={category}
-                onClick={() => setSelectedCategory(category)}
-                variant="ghost"
-                className={cn(
-                    "rounded-full px-6 transition-colors duration-300 font-semibold",
-                    selectedCategory === category
-                    ? "bg-primary text-primary-foreground hover:bg-primary/90"
-                    : "bg-card text-card-foreground hover:bg-card/80"
-                )}
-                >
-                {category}
-                </Button>
-            ))}
-            </div>
+            <ScrollArea className="w-full whitespace-nowrap rounded-md mb-8">
+              <div className="flex w-max space-x-2 pb-4">
+                {categories.map((category) => (
+                    <Button
+                    key={category}
+                    onClick={() => setSelectedCategory(category)}
+                    variant="ghost"
+                    className={cn(
+                        "rounded-full px-6 transition-colors duration-300 font-semibold",
+                        selectedCategory === category
+                        ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                        : "bg-card text-card-foreground hover:bg-card/80"
+                    )}
+                    >
+                    {category}
+                    </Button>
+                ))}
+              </div>
+              <ScrollBar orientation="horizontal" className="invisible" />
+            </ScrollArea>
             
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredItems.map((item) => (
