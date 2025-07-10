@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useParams, useRouter } from 'next/navigation';
@@ -190,16 +191,25 @@ export default function EditMenuItemPage() {
 
     try {
       if (imageFile) {
+        const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+        const uploadPreset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
+
+        if (!cloudName || !uploadPreset) {
+            throw new Error('Cloudinary environment variables are not configured.');
+        }
+
         const formData = new FormData();
         formData.append('file', imageFile);
-        formData.append('upload_preset', process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET!);
+        formData.append('upload_preset', uploadPreset);
         
-        const res = await fetch(`https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`, {
+        const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
             method: 'POST',
             body: formData,
         });
         
         if (!res.ok) {
+            const errorData = await res.json();
+            console.error('Cloudinary upload error:', errorData);
             throw new Error('Resim yüklemesi başarısız oldu.');
         }
         
@@ -208,7 +218,7 @@ export default function EditMenuItemPage() {
       }
 
       const docRef = doc(db, 'menuItems', itemId);
-      await updateDoc(docRef, { ...values, imageUrl: imageUrl });
+      await updateDoc(docRef, { ...values, imageUrl: imageUrl, aiHint: values.name.split(' ').slice(0, 2).join(' ').toLowerCase() });
       toast({
         title: 'Başarılı!',
         description: 'Ürün başarıyla güncellendi.',
@@ -218,11 +228,12 @@ export default function EditMenuItemPage() {
     } catch (error: any) {
       console.error('Güncelleme hatası: ', error);
       let description = 'Ürün güncellenirken bir hata oluştu.';
-      if (error.message.includes('Cloudinary') || error.message.includes('Resim')) {
-        description = 'Resim yüklenemedi. Lütfen Cloudinary ayarlarınızı (.env dosyası) kontrol edin.';
+      if (error.message.includes('Cloudinary environment variables')) {
+        description = 'Cloudinary ayarları eksik. Lütfen .env dosyasını kontrol edin.';
+      } else if (error.message.includes('Resim yüklemesi')) {
+        description = 'Resim yüklenemedi. Lütfen Cloudinary ayarlarınızı ve internet bağlantınızı kontrol edin.';
       } else if (error.code === 'permission-denied') {
-        description =
-          'Veritabanına yazma izniniz yok. Lütfen Firebase kurallarınızı kontrol edin.';
+        description = 'Veritabanına yazma izniniz yok. Lütfen Firebase kurallarınızı kontrol edin.';
       }
       toast({
         title: 'Hata!',
@@ -398,7 +409,4 @@ export default function EditMenuItemPage() {
             </div>
           </form>
         </Form>
-      </CardContent>
-    </Card>
-  );
-}
+      </
