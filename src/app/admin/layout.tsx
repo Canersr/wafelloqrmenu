@@ -35,7 +35,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
         title: 'Başarılı',
         description: 'Güvenli bir şekilde çıkış yaptınız.',
       });
-      router.push('/login');
+      router.push('/');
     } catch (error) {
       console.error('Çıkış hatası:', error);
       toast({
