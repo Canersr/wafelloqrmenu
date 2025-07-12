@@ -6,23 +6,13 @@
  * - SignCloudinaryUploadOutput - The return type for the signCloudinaryUpload function.
  */
 
+// IMPORTANT: Load environment variables at the very beginning
+import { config } from 'dotenv';
+config();
+
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
 import { v2 as cloudinary } from 'cloudinary';
-
-// Configure Cloudinary with credentials from environment variables
-const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
-const apiKey = process.env.CLOUDINARY_API_KEY;
-const apiSecret = process.env.CLOUDINARY_API_SECRET;
-
-if (cloudName && apiKey && apiSecret) {
-  cloudinary.config({
-    cloud_name: cloudName,
-    api_key: apiKey,
-    api_secret: apiSecret,
-    secure: true,
-  });
-}
 
 const SignCloudinaryUploadOutputSchema = z.object({
   signature: z.string().describe('The generated signature for the upload.'),
@@ -46,11 +36,26 @@ const signCloudinaryUploadFlow = ai.defineFlow(
     outputSchema: SignCloudinaryUploadOutputSchema,
   },
   async () => {
-    if (!apiKey || !apiSecret || !cloudName) {
+    // Read variables inside the flow to ensure they are loaded
+    const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+    const apiKey = process.env.CLOUDINARY_API_KEY;
+    const apiSecret = process.env.CLOUDINARY_API_SECRET;
+    
+    // Check for variables and configure Cloudinary inside the flow
+    if (!cloudName || !apiKey || !apiSecret) {
+      console.error('Cloudinary environment variables missing. Check your .env file.');
       throw new Error(
         'Cloudinary API Key, Secret, or Cloud Name is not configured in environment variables.'
       );
     }
+    
+    cloudinary.config({
+      cloud_name: cloudName,
+      api_key: apiKey,
+      api_secret: apiSecret,
+      secure: true,
+    });
+    
     const timestamp = Math.round(new Date().getTime() / 1000);
 
     const signature = cloudinary.utils.api_sign_request(
