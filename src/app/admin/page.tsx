@@ -86,6 +86,17 @@ export default function AdminDashboard() {
         return;
       }
       
+      // Seed categories first
+      const categoriesCollection = collection(db, 'categories');
+      const existingCategoriesSnapshot = await getDocs(categoriesCollection);
+      if (existingCategoriesSnapshot.empty) {
+        const uniqueCategories = [...new Set(sampleMenuItems.map(item => item.category))];
+        for (const categoryName of uniqueCategories) {
+          await addDoc(categoriesCollection, { name: categoryName });
+        }
+      }
+
+      // Seed menu items
       const menuItemsCollection = collection(db, 'menuItems');
       for (const item of sampleMenuItems) {
         await addDoc(menuItemsCollection, item);
@@ -93,7 +104,7 @@ export default function AdminDashboard() {
       
       toast({
         title: 'Başarılı!',
-        description: 'Örnek ürünler veritabanına başarıyla eklendi.',
+        description: 'Örnek ürünler ve kategoriler veritabanına başarıyla eklendi.',
         variant: 'default',
       });
     } catch (error: any) {
