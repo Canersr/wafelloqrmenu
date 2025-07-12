@@ -263,7 +263,7 @@ export default function AddMenuItemPage() {
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder={isCategoriesLoading ? "Kategoriler yükleniyor..." : "Bir kategori seçin"} />
-                      </SelectTrigger>
+                      </Trigger>
                     </FormControl>
                     <SelectContent>
                       {categories.map((category) => (
