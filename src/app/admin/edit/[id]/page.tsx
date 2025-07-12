@@ -405,7 +405,7 @@ export default function EditMenuItemPage() {
               >
                 İptal
               </Button>
-              <Button type="submit" disabled={loading || isCompressing || isAiLoading}>
+              <Button type="submit" disabled={loading || isCompressing || isAiLoading || !imagePreview}>
                 {(loading || isCompressing) && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 {isCompressing ? 'Resim Hazırlanıyor...' : loading ? 'Güncelleniyor...' : 'Güncelle'}
               </Button>

@@ -351,7 +351,7 @@ export default function AddMenuItemPage() {
               >
                 İptal
               </Button>
-              <Button type="submit" disabled={loading || isCompressing || !imagePreview || isAiLoading || isCategoriesLoading || categories.length === 0}>
+              <Button type="submit" disabled={loading || isCompressing || !imageFile || !imagePreview || isAiLoading || isCategoriesLoading || categories.length === 0}>
                 {(loading || isCompressing) && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 {isCompressing ? 'Resim Hazırlanıyor...' : loading ? 'Kaydediliyor...' : 'Kaydet'}
               </Button>
