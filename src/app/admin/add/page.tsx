@@ -77,7 +77,7 @@ export default function AddMenuItemPage() {
         const querySnapshot = await getDocs(q);
         const fetchedCategories = querySnapshot.docs.map(doc => doc.data().name);
         setCategories(fetchedCategories);
-         if (fetchedCategories.length === 0) {
+        if (fetchedCategories.length === 0) {
             toast({
                 title: 'Uyarı',
                 description: 'Hiç kategori bulunamadı. Lütfen önce bir kategori ekleyin.',
@@ -102,7 +102,8 @@ export default function AddMenuItemPage() {
     const file = e.target.files?.[0];
     if (file) {
       setImageFile(null); // Reset previous file
-      setImagePreview(URL.createObjectURL(file)); // Show preview instantly
+      const previewUrl = URL.createObjectURL(file);
+      setImagePreview(previewUrl); // Show preview instantly
       setIsCompressing(true);
       try {
         const compressedFile = await compressImage(file);
@@ -263,7 +264,7 @@ export default function AddMenuItemPage() {
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder={isCategoriesLoading ? "Kategoriler yükleniyor..." : "Bir kategori seçin"} />
-                      </Trigger>
+                      </SelectTrigger>
                     </FormControl>
                     <SelectContent>
                       {categories.map((category) => (

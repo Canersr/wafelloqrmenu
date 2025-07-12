@@ -135,7 +135,8 @@ export default function EditMenuItemPage() {
     const file = e.target.files?.[0];
     if (file) {
       setImageFile(null);
-      setImagePreview(URL.createObjectURL(file));
+      const previewUrl = URL.createObjectURL(file);
+      setImagePreview(previewUrl);
       setIsCompressing(true);
       try {
         const compressedFile = await compressImage(file);
