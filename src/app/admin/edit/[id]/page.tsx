@@ -231,7 +231,7 @@ export default function EditMenuItemPage() {
       if (error.message.includes('Cloudinary environment variables')) {
         description = 'Cloudinary ayarları eksik. Lütfen .env dosyasını kontrol edin.';
       } else if (error.message.includes('Resim yüklemesi başarısız oldu')) {
-        description = 'Resim yüklenemedi. Lütfen Cloudinary ayarlarınızı ve internet bağlantınızı kontrol edin.';
+        description = 'Resim yüklenemedi. Lütfen Cloudinary ayarlarınızı kontrol edin. Upload Preset "Unsigned" modda olmalı.';
       } else if (error.code === 'permission-denied') {
         description = 'Veritabanına yazma izniniz yok. Lütfen Firebase kurallarınızı kontrol edin.';
       }
