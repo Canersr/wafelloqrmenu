@@ -36,7 +36,7 @@ const signCloudinaryUploadFlow = ai.defineFlow(
     outputSchema: SignCloudinaryUploadOutputSchema,
   },
   async () => {
-    // Read variables inside the flow to ensure they are loaded
+    // Read variables inside the flow to ensure they are loaded at runtime
     const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
     const apiKey = process.env.CLOUDINARY_API_KEY;
     const apiSecret = process.env.CLOUDINARY_API_SECRET;
