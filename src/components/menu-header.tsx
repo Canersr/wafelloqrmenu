@@ -12,12 +12,12 @@ export function MenuHeader() {
             <ChevronLeft className="h-6 w-6" />
           </Button>
         </Link>
-        <div className="flex items-center justify-center gap-4 select-none">
+        <Link href="/" className="flex items-center justify-center gap-4 select-none no-underline">
           <WaffleLogo className="w-32 h-32 sm:w-36 sm:h-36" />
           <h1 className="text-7xl sm:text-8xl font-handwriting text-primary">
             Wafello
           </h1>
-        </div>
+        </Link>
       </div>
     </header>
   );
