@@ -1,3 +1,4 @@
+
 'use client';
 
 import { Button } from '@/components/ui/button';
@@ -62,7 +63,7 @@ export default function HomePage() {
   };
 
   const handleCopyLink = () => {
-    navigator.clipboard.writeText(siteUrl);
+    navigator.clipboard.writeText(shareData.url);
     toast({
       title: 'Kopyalandı!',
       description: 'Link panoya kopyalandı.',
@@ -164,14 +165,14 @@ export default function HomePage() {
                 <DialogHeader>
                   <DialogTitle>Wafello'yu Paylaş</DialogTitle>
                   <DialogDescription>
-                    Arkadaşlarını davet etmenin en kolay yolu!
+                    Müşterilerinizin menüye kolayca erişmesi için QR kodu kullanın.
                   </DialogDescription>
                 </DialogHeader>
                 <div className="flex flex-col items-center gap-6 py-4">
                   <div className="p-4 bg-white rounded-lg border">
                     {siteUrl && (
                       <QRCode
-                        value={siteUrl}
+                        value={`${siteUrl}/menu`}
                         size={160}
                         bgColor="#ffffff"
                         fgColor="#000000"
@@ -181,7 +182,7 @@ export default function HomePage() {
                     )}
                   </div>
                   <div className="w-full flex flex-col gap-3">
-                     <p className="text-sm text-center text-muted-foreground">- veya sosyal medyada paylaş -</p>
+                     <p className="text-sm text-center text-muted-foreground">- veya linki paylaş -</p>
                     <div className="grid grid-cols-2 gap-2">
                        <Button variant="outline" asChild>
                          <a href={getSocialShareLink('whatsapp', shareData.url, shareData.text)} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp'ta Paylaş">
@@ -206,7 +207,7 @@ export default function HomePage() {
                     </div>
                     <Button onClick={handleCopyLink} variant="secondary">
                       <LinkIcon className="mr-2 h-4 w-4" />
-                      Linki Kopyala
+                      Site Linkini Kopyala
                     </Button>
                   </div>
                 </div>
