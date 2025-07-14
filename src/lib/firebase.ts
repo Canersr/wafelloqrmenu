@@ -4,7 +4,8 @@ import { getFirestore } from 'firebase/firestore';
 import { 
   getAuth, 
   setPersistence, 
-  browserSessionPersistence 
+  browserSessionPersistence,
+  type Auth
 } from 'firebase/auth';
 
 const firebaseConfig = {
@@ -16,15 +17,20 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
-// Firebase'i başlat
+// Initialize Firebase
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 const db = getFirestore(app);
-const auth = getAuth(app);
+const auth: Auth = getAuth(app);
 
-// Oturum kalıcılığını ayarla
-// Bu, kullanıcının sadece mevcut tarayıcı sekmesi açık olduğu sürece giriş yapmış kalmasını sağlar.
-// Sekme kapatıldığında oturum sonlanır.
-setPersistence(auth, browserSessionPersistence);
-
+// Immediately-invoked async function to handle persistence
+(async () => {
+  try {
+    // This function is asynchronous and returns a Promise.
+    // We must wait for it to complete before the auth object is used elsewhere.
+    await setPersistence(auth, browserSessionPersistence);
+  } catch (error) {
+    console.error("Firebase: Could not set session persistence.", error);
+  }
+})();
 
 export { db, auth };
