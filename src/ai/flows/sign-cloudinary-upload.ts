@@ -1,18 +1,21 @@
+
 'use server';
 /**
  * @fileOverview A server-side flow to securely generate a signature for Cloudinary uploads.
+ *
+ * THIS FLOW IS CURRENTLY NOT IN USE. The application has been switched to an 'unsigned'
+ * upload method which uses an upload_preset on the client-side and does not
+ * require a server-side signature. This simplifies the process and avoids
+ * environment variable issues.
  *
  * - signCloudinaryUpload - A function that returns a signature and other parameters needed for a signed upload.
  * - SignCloudinaryUploadOutput - The return type for the signCloudinaryUpload function.
  */
 
-// IMPORTANT: Load environment variables at the very beginning
-import { config } from 'dotenv';
-config();
-
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
 import { v2 as cloudinary } from 'cloudinary';
+import { config } from 'dotenv';
 
 const SignCloudinaryUploadOutputSchema = z.object({
   signature: z.string().describe('The generated signature for the upload.'),
@@ -36,12 +39,13 @@ const signCloudinaryUploadFlow = ai.defineFlow(
     outputSchema: SignCloudinaryUploadOutputSchema,
   },
   async () => {
-    // Read variables inside the flow to ensure they are loaded at runtime
+    // Load environment variables at the start of the flow
+    config();
+
     const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
     const apiKey = process.env.CLOUDINARY_API_KEY;
     const apiSecret = process.env.CLOUDINARY_API_SECRET;
     
-    // Check for variables and configure Cloudinary inside the flow
     if (!cloudName || !apiKey || !apiSecret) {
       console.error('Cloudinary environment variables missing. Check your .env file.');
       throw new Error(

@@ -40,7 +40,6 @@ import { Skeleton } from '@/components/ui/skeleton';
 import Image from 'next/image';
 import { compressImage } from '@/lib/image-compressor';
 import { generateDescription } from '@/ai/flows/generate-description';
-import { signCloudinaryUpload } from '@/ai/flows/sign-cloudinary-upload';
 
 
 const formSchema = z.object({
@@ -194,17 +193,16 @@ export default function EditMenuItemPage() {
 
     try {
       if (imageFile) {
-        const { signature, timestamp, apiKey, cloudName } = await signCloudinaryUpload();
+        const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+        const uploadPreset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
 
-        if (!cloudName || !apiKey) {
-            throw new Error('Cloudinary environment variables are not configured on the server.');
+        if (!cloudName || !uploadPreset) {
+            throw new Error('Cloudinary cloud name or upload preset is not configured in environment variables.');
         }
 
         const formData = new FormData();
         formData.append('file', imageFile);
-        formData.append('signature', signature);
-        formData.append('timestamp', timestamp.toString());
-        formData.append('api_key', apiKey);
+        formData.append('upload_preset', uploadPreset);
         
         const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
             method: 'POST',
@@ -232,10 +230,10 @@ export default function EditMenuItemPage() {
     } catch (error: any) {
       console.error('Güncelleme hatası: ', error);
       let description = 'Ürün güncellenirken bir hata oluştu.';
-      if (error.message.includes('Cloudinary environment variables')) {
-        description = 'Sunucu tarafında Cloudinary ayarları eksik. Lütfen .env dosyasını kontrol edin.';
+      if (error.message.includes('Cloudinary cloud name or upload preset')) {
+        description = 'Sunucu tarafında Cloudinary ayarları eksik. Lütfen .env dosyasındaki NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME ve NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET değişkenlerini kontrol edin.';
       } else if (error.message.includes('Resim yüklemesi başarısız oldu')) {
-        description = 'Resim yüklenemedi. Lütfen Cloudinary API anahtar, secret ve cloud name bilgilerinizin doğru olduğundan emin olun.';
+        description = 'Resim yüklenemedi. Lütfen Cloudinary ayarlarınızı ve internet bağlantınızı kontrol edin.';
       } else if (error.code === 'permission-denied') {
         description = 'Veritabanına yazma izniniz yok. Lütfen Firebase kurallarınızı kontrol edin.';
       }
