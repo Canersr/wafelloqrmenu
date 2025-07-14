@@ -6,14 +6,12 @@ import { MenuHeader } from '@/components/menu-header';
 import { Menu } from '@/components/menu';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { unstable_noStore as noStore } from 'next/cache';
 
-// By default, Next.js would cache this data forever.
-// We use revalidation to ensure the data is fresh without sacrificing speed.
-// This tells Next.js to fetch new data at most once every 60 seconds.
+// Incremental Static Regeneration (ISR)
+// Bu, Next.js'e bu sayfayı statik olarak oluşturmasını ve ardından
+// arka planda en fazla 60 saniyede bir yeniden doğrulamasını söyler.
+// Bu, çoğu kullanıcı için anında yükleme süreleri sağlarken verilerin taze kalmasını sağlar.
 export const revalidate = 60; 
-// Force dynamic rendering to ensure revalidation works as expected.
-export const dynamic = 'force-dynamic'
 
 async function getMenuItems(): Promise<MenuItem[]> {
   try {
@@ -26,8 +24,9 @@ async function getMenuItems(): Promise<MenuItem[]> {
     })) as MenuItem[];
     return items;
   } catch (error) {
-    console.error("Error fetching menu items: ", error);
-    // In case of an error, we return an empty array so the page doesn't break.
+    console.error("Menü ürünleri çekilirken hata oluştu: ", error);
+    // Hata durumunda sayfanın çökmemesi için boş bir dizi döndür.
+    // Gerçek bir uygulamada burada daha kapsamlı bir hata günlüğü tutulabilir.
     return [];
   }
 }
@@ -51,8 +50,8 @@ export default async function MenuPage() {
   );
 }
 
-// A fallback component that can be used with React Suspense to show a loading state.
-// Next.js can detect and use this automatically.
+// React Suspense ile kullanılabilen ve yükleme durumunu gösteren bir yedek bileşen.
+// Next.js bunu otomatik olarak algılayıp kullanabilir.
 export function Loading() {
  return (
     <div className="flex flex-col min-h-dvh bg-background">
