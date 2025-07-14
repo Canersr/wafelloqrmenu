@@ -37,10 +37,12 @@ export default function HomePage() {
   const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodedAddress}`;
   const { toast } = useToast();
   const [siteUrl, setSiteUrl] = useState('');
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
     // Ensure this runs only on the client where `window` is available
     setSiteUrl(window.location.origin);
+    setIsClient(true);
   }, []);
 
   const shareData = {
@@ -54,24 +56,23 @@ export default function HomePage() {
       try {
         await navigator.share(shareData);
       } catch (error) {
-        console.error('Error sharing:', error);
+        // This can happen if the user cancels the share dialog, so we don't need to show an error.
+        console.log('Share action was cancelled or failed', error);
       }
-    } else {
-      // Fallback for browsers that don't support Web Share API
-      // The dialog will be opened by the DialogTrigger
     }
   };
 
   const handleCopyLink = () => {
-    navigator.clipboard.writeText(shareData.url);
+    navigator.clipboard.writeText(`${siteUrl}/menu`);
     toast({
       title: 'Kopyalandı!',
-      description: 'Link panoya kopyalandı.',
+      description: 'Menü linki panoya kopyalandı.',
     });
   };
 
   const getSocialShareLink = (platform: SocialPlatform, url: string, text: string) => {
-    const encodedUrl = encodeURIComponent(url);
+    const menuUrl = `${url}/menu`;
+    const encodedUrl = encodeURIComponent(menuUrl);
     const encodedText = encodeURIComponent(text);
 
     switch (platform) {
@@ -155,7 +156,6 @@ export default function HomePage() {
                   variant="outline"
                   size="lg"
                   className="h-14 text-lg font-semibold rounded-full border-2 border-primary text-primary bg-background hover:bg-primary/10"
-                  onClick={handleShare}
                 >
                   <Share2 className="mr-2 h-5 w-5" />
                   Paylaş
@@ -165,7 +165,7 @@ export default function HomePage() {
                 <DialogHeader>
                   <DialogTitle>Wafello'yu Paylaş</DialogTitle>
                   <DialogDescription>
-                    Müşterilerinizin menüye kolayca erişmesi için QR kodu kullanın.
+                    Müşterilerinizin menüye kolayca erişmesi için QR kodu veya linki kullanın.
                   </DialogDescription>
                 </DialogHeader>
                 <div className="flex flex-col items-center gap-6 py-4">
@@ -182,7 +182,17 @@ export default function HomePage() {
                     )}
                   </div>
                   <div className="w-full flex flex-col gap-3">
-                     <p className="text-sm text-center text-muted-foreground">- veya linki paylaş -</p>
+                     <div className="relative flex py-2 items-center">
+                        <div className="flex-grow border-t border-muted-foreground/20"></div>
+                        <span className="flex-shrink mx-4 text-xs text-muted-foreground">- veya -</span>
+                        <div className="flex-grow border-t border-muted-foreground/20"></div>
+                    </div>
+                     {isClient && navigator.share && (
+                        <Button onClick={handleShare} variant="default" size="lg">
+                          <Share2 className="mr-2 h-4 w-4" />
+                          Cihazın Paylaşım Menüsünü Kullan
+                        </Button>
+                     )}
                     <div className="grid grid-cols-2 gap-2">
                        <Button variant="outline" asChild>
                          <a href={getSocialShareLink('whatsapp', shareData.url, shareData.text)} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp'ta Paylaş">
@@ -207,7 +217,7 @@ export default function HomePage() {
                     </div>
                     <Button onClick={handleCopyLink} variant="secondary">
                       <LinkIcon className="mr-2 h-4 w-4" />
-                      Site Linkini Kopyala
+                      Menü Linkini Kopyala
                     </Button>
                   </div>
                 </div>
