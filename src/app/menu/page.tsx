@@ -1,4 +1,3 @@
-
 import { collection, getDocs, orderBy, query } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import type { MenuItem } from '@/types';
@@ -8,9 +7,9 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 
 // Incremental Static Regeneration (ISR)
-// Bu, Next.js'e bu sayfayı statik olarak oluşturmasını ve ardından
-// arka planda en fazla 60 saniyede bir yeniden doğrulamasını söyler.
-// Bu, çoğu kullanıcı için anında yükleme süreleri sağlarken verilerin taze kalmasını sağlar.
+// This tells Next.js to statically generate this page and then
+// revalidate it in the background at most once every 60 seconds.
+// This ensures data stays fresh while providing instant load times for most users.
 export const revalidate = 60; 
 
 async function getMenuItems(): Promise<MenuItem[]> {
@@ -24,9 +23,9 @@ async function getMenuItems(): Promise<MenuItem[]> {
     })) as MenuItem[];
     return items;
   } catch (error) {
-    console.error("Menü ürünleri çekilirken hata oluştu: ", error);
-    // Hata durumunda sayfanın çökmemesi için boş bir dizi döndür.
-    // Gerçek bir uygulamada burada daha kapsamlı bir hata günlüğü tutulabilir.
+    console.error("Error fetching menu items: ", error);
+    // In case of an error, return an empty array to prevent the page from crashing.
+    // In a real application, more robust error logging could be implemented here.
     return [];
   }
 }
@@ -50,8 +49,8 @@ export default async function MenuPage() {
   );
 }
 
-// React Suspense ile kullanılabilen ve yükleme durumunu gösteren bir yedek bileşen.
-// Next.js bunu otomatik olarak algılayıp kullanabilir.
+// A fallback component to show while the page is loading, usable with React Suspense.
+// Next.js can automatically detect and use this.
 export function Loading() {
  return (
     <div className="flex flex-col min-h-dvh bg-background">
