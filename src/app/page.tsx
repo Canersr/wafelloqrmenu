@@ -1,4 +1,3 @@
-
 'use client';
 
 import { Button } from '@/components/ui/button';
@@ -38,33 +37,20 @@ export default function HomePage() {
   const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodedAddress}`;
   const { toast } = useToast();
   const [isClient, setIsClient] = useState(false);
-  const [siteUrl, setSiteUrl] = useState('');
-
-  // IMPORTANT: This URL needs to be the publicly accessible URL of your Firebase Studio preview.
-  // It is set here to ensure the QR code works reliably in a development environment.
-  // When deploying to production, this can be replaced with an environment variable.
-  const getPreviewUrl = () => {
-    if (typeof window !== 'undefined') {
-        // This will be in the format: https://<port>-<instance-id>.<region>.cloudworkstations.dev
-        return window.location.origin;
-    }
-    // Provide a fallback or handle server-side case if necessary
-    return '';
-  }
   
-  const previewUrl = getPreviewUrl();
+  // Set the final domain name directly.
+  const siteUrl = 'https://wafelloqr.com';
 
   useEffect(() => {
-    // This effect ensures that navigator.share is only checked on the client-side
-    // and that the component re-renders to show the correct UI.
+    // This effect ensures that client-side APIs like `navigator.share` are only checked
+    // after the component has mounted on the client.
     setIsClient(true);
-    setSiteUrl(window.location.origin);
   }, []);
 
   const shareData = {
     title: 'Wafello - The Art of Waffles',
     text: 'Check out the most delicious waffles in town!',
-    url: siteUrl,
+    url: `${siteUrl}/menu`,
   };
 
 
@@ -80,7 +66,6 @@ export default function HomePage() {
   };
 
   const handleCopyLink = () => {
-    if (!siteUrl) return;
     navigator.clipboard.writeText(`${siteUrl}/menu`);
     toast({
       title: 'Kopyalandı!',
@@ -89,7 +74,6 @@ export default function HomePage() {
   };
 
   const getSocialShareLink = (platform: SocialPlatform, url: string, text: string) => {
-    if (!url) return '#';
     const menuUrl = `${url}/menu`;
     const encodedUrl = encodeURIComponent(menuUrl);
     const encodedText = encodeURIComponent(text);
@@ -189,20 +173,14 @@ export default function HomePage() {
                 </DialogHeader>
                 <div className="flex flex-col items-center gap-6 py-4">
                   <div className="p-4 bg-white rounded-lg border">
-                    {isClient && previewUrl ? (
-                      <QRCode
-                        value={`${previewUrl}/menu`}
-                        size={160}
-                        bgColor="#ffffff"
-                        fgColor="#000000"
-                        level="Q"
-                        includeMargin={false}
-                      />
-                    ) : (
-                       <div className="w-[160px] h-[160px] flex items-center justify-center bg-gray-100 rounded-lg">
-                          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-                       </div>
-                    )}
+                    <QRCode
+                      value={`${siteUrl}/menu`}
+                      size={160}
+                      bgColor="#ffffff"
+                      fgColor="#000000"
+                      level="Q"
+                      includeMargin={false}
+                    />
                   </div>
                   <div className="w-full flex flex-col gap-3">
                      <div className="relative flex py-2 items-center">
@@ -218,17 +196,17 @@ export default function HomePage() {
                      )}
                     <div className="grid grid-cols-2 gap-2">
                        <Button variant="outline" asChild>
-                         <a href={getSocialShareLink('whatsapp', shareData.url, shareData.text)} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp'ta Paylaş">
+                         <a href={getSocialShareLink('whatsapp', siteUrl, shareData.text)} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp'ta Paylaş">
                             <MessageCircle /> WhatsApp
                          </a>
                       </Button>
                       <Button variant="outline" asChild>
-                         <a href={getSocialShareLink('twitter', shareData.url, shareData.text)} target="_blank" rel="noopener noreferrer" aria-label="Twitter'da Paylaş">
+                         <a href={getSocialShareLink('twitter', siteUrl, shareData.text)} target="_blank" rel="noopener noreferrer" aria-label="Twitter'da Paylaş">
                            <Twitter /> Twitter
                          </a>
                       </Button>
                       <Button variant="outline" asChild>
-                         <a href={getSocialShareLink('facebook', shareData.url, shareData.text)} target="_blank" rel="noopener noreferrer" aria-label="Facebook'ta Paylaş">
+                         <a href={getSocialShareLink('facebook', siteUrl, shareData.text)} target="_blank" rel="noopener noreferrer" aria-label="Facebook'ta Paylaş">
                            <Facebook /> Facebook
                          </a>
                       </Button>
