@@ -26,6 +26,7 @@ import {
 import QRCode from 'qrcode.react';
 import { useToast } from '@/hooks/use-toast';
 import { useState, useEffect } from 'react';
+import { Loader2 } from 'lucide-react';
 
 // Define a type for social media platforms
 type SocialPlatform = 'whatsapp' | 'twitter' | 'facebook';
@@ -36,13 +37,28 @@ export default function HomePage() {
   const googleMapsEmbedUrl = `https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3191.206495392769!2d30.70566367683938!3d36.88517596205908!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x14c3913707a2c2b3%3A0x868b7522cfca46e4!2sSinan%2C%201254.%20Sk.%20No%3A18D%2C%2007310%20Muratpa%C5%9Fa%2FAntalya!5e0!3m2!1str!2str!4v1720603700057!5m2!1str!2str`;
   const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodedAddress}`;
   const { toast } = useToast();
-  const [siteUrl, setSiteUrl] = useState('');
   const [isClient, setIsClient] = useState(false);
+  const [siteUrl, setSiteUrl] = useState('');
+
+  // IMPORTANT: This URL needs to be the publicly accessible URL of your Firebase Studio preview.
+  // It is set here to ensure the QR code works reliably in a development environment.
+  // When deploying to production, this can be replaced with an environment variable.
+  const getPreviewUrl = () => {
+    if (typeof window !== 'undefined') {
+        // This will be in the format: https://<port>-<instance-id>.<region>.cloudworkstations.dev
+        return window.location.origin;
+    }
+    // Provide a fallback or handle server-side case if necessary
+    return '';
+  }
+  
+  const previewUrl = getPreviewUrl();
 
   useEffect(() => {
-    // Ensure this runs only on the client where `window` is available
-    setSiteUrl(window.location.origin);
+    // This effect ensures that navigator.share is only checked on the client-side
+    // and that the component re-renders to show the correct UI.
     setIsClient(true);
+    setSiteUrl(window.location.origin);
   }, []);
 
   const shareData = {
@@ -50,6 +66,7 @@ export default function HomePage() {
     text: 'Check out the most delicious waffles in town!',
     url: siteUrl,
   };
+
 
   const handleShare = async () => {
     if (navigator.share) {
@@ -63,6 +80,7 @@ export default function HomePage() {
   };
 
   const handleCopyLink = () => {
+    if (!siteUrl) return;
     navigator.clipboard.writeText(`${siteUrl}/menu`);
     toast({
       title: 'Kopyalandı!',
@@ -71,6 +89,7 @@ export default function HomePage() {
   };
 
   const getSocialShareLink = (platform: SocialPlatform, url: string, text: string) => {
+    if (!url) return '#';
     const menuUrl = `${url}/menu`;
     const encodedUrl = encodeURIComponent(menuUrl);
     const encodedText = encodeURIComponent(text);
@@ -170,15 +189,19 @@ export default function HomePage() {
                 </DialogHeader>
                 <div className="flex flex-col items-center gap-6 py-4">
                   <div className="p-4 bg-white rounded-lg border">
-                    {siteUrl && (
+                    {isClient && previewUrl ? (
                       <QRCode
-                        value={`${siteUrl}/menu`}
+                        value={`${previewUrl}/menu`}
                         size={160}
                         bgColor="#ffffff"
                         fgColor="#000000"
                         level="Q"
                         includeMargin={false}
                       />
+                    ) : (
+                       <div className="w-[160px] h-[160px] flex items-center justify-center bg-gray-100 rounded-lg">
+                          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+                       </div>
                     )}
                   </div>
                   <div className="w-full flex flex-col gap-3">
