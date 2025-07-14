@@ -17,6 +17,8 @@ import { z } from 'genkit';
 import { v2 as cloudinary } from 'cloudinary';
 import { config } from 'dotenv';
 
+config(); // Load environment variables
+
 const SignCloudinaryUploadOutputSchema = z.object({
   signature: z.string().describe('The generated signature for the upload.'),
   timestamp: z.number().describe('The timestamp used for the signature.'),
@@ -39,9 +41,6 @@ const signCloudinaryUploadFlow = ai.defineFlow(
     outputSchema: SignCloudinaryUploadOutputSchema,
   },
   async () => {
-    // Load environment variables at the start of the flow
-    config();
-
     const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
     const apiKey = process.env.CLOUDINARY_API_KEY;
     const apiSecret = process.env.CLOUDINARY_API_SECRET;
@@ -77,3 +76,5 @@ const signCloudinaryUploadFlow = ai.defineFlow(
     };
   }
 );
+
+    
