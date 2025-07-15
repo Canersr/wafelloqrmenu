@@ -1,7 +1,9 @@
 
 # Vercel'de Projeyi Yayınlama Rehberi
 
-Merhaba! Bu rehber, projenizi Vercel'de başarıyla yayınlarken karşılaştığınız `auth/invalid-api-key` hatasını çözmek için hazırlanmıştır. Sorun kodda değil, Vercel'in projenizin gizli anahtarlarını (API Key vb.) bilmemesinden kaynaklanıyor.
+Merhaba! Bu rehber, projenizi Vercel'de başarıyla yayınlarken karşılaştığınız `auth/invalid-api-key` hatasını çözmek için hazırlanmıştır. 
+
+**Önemli Not:** Sorun kodda değil, Vercel'in projenizin gizli anahtarlarını (API Key vb.) bilmemesinden kaynaklanıyor. Güvenlik nedeniyle bu anahtarlar doğrudan koda yazılamaz. Bu bilgileri, aşağıda anlatıldığı gibi Vercel'in güvenli "Environment Variables" (Ortam Değişkenleri) paneline sizin eklemeniz gerekmektedir.
 
 Lütfen aşağıdaki adımları dikkatlice takip edin.
 
@@ -13,27 +15,23 @@ Lütfen aşağıdaki adımları dikkatlice takip edin.
 2.  `Wafello` projenizi seçin.
 3.  Sol üst köşedeki **çark simgesine (⚙️)** tıklayın ve **Project settings (Proje Ayarları)** seçeneğini seçin.
 
-
-
 ---
 
-### Adım 2: Gizli Anahtarları Bulun ve Kopyalayın
+### Adım 2: Firebase Gizli Anahtarlarını Bulun ve Kopyalayın
 
 1.  **General (Genel)** sekmesinde, sayfanın altına doğru kaydırın.
 2.  **Your apps (Uygulamalarınız)** bölümünde, web uygulamanızı (`wafelloqr.com` veya benzeri) göreceksiniz.
 3.  **SDK setup and configuration (SDK kurulumu ve yapılandırması)** bölümünde, **Config (Yapılandırma)** seçeneğini seçin.
 4.  Aşağıdaki resimde gösterilen `firebaseConfig` objesinin içindeki anahtarları ve değerlerini kopyalamanız gerekecek.
 
-
-
 ---
 
 ### Adım 3: Cloudinary Bilgilerini Bulun
 
 1.  [Cloudinary Paneli'ne](https://cloudinary.com/console) gidin.
-2.  Panonuzda (Dashboard), `Cloud Name`, `API Key` ve `API Secret` gibi bilgileri göreceksiniz.
+2.  Panonuzda (Dashboard), `Cloud Name` gibi bilgileri göreceksiniz.
 3.  **Settings (Ayarlar) > Upload (Yükleme)** sekmesine gidin.
-4.  Sayfanın altında **Upload presets (Yükleme ön ayarları)** bölümünü bulun ve Wafello için oluşturduğunuz preset'in adını not alın (genellikle `ml_default` gibi bir şeydir, ancak siz özel bir tane oluşturmuş olabilirsiniz).
+4.  Sayfanın altında **Upload presets (Yükleme ön ayarları)** bölümünü bulun ve Wafello için oluşturduğunuz preset'in adını not alın.
 
 ---
 
@@ -57,15 +55,12 @@ Bu en önemli adımdır.
 | `NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID`  | *Firebase'den kopyaladığınız messagingSenderId* |
 | `NEXT_PUBLIC_FIREBASE_APP_ID`               | *Firebase'den kopyaladığınız appId*            |
 
-**Cloudinary Değişkenleri:**
+**Cloudinary Değişkenleri (Resim Yükleme İçin Gerekli):**
 
 | Anahtar (KEY)                             | Değer (VALUE)                                       |
 | ----------------------------------------- | --------------------------------------------------- |
 | `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME`       | *Cloudinary panonuzdaki Cloud Name*                 |
 | `NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET`    | *Cloudinary'deki Upload Preset adınız*              |
-
-
-
 
 ---
 
@@ -74,8 +69,6 @@ Bu en önemli adımdır.
 1.  Tüm ortam değişkenlerini kaydettikten sonra, Vercel projenizin **Deployments (Dağıtımlar)** sekmesine gidin.
 2.  En son, başarısız olan dağıtımın yanındaki **üç nokta (...)** menüsüne tıklayın.
 3.  **Redeploy** seçeneğini seçin.
-
-
 
 Bu işlem, Vercel'in projenizi yeni eklediğiniz ortam değişkenleriyle birlikte sıfırdan derlemesini sağlayacaktır. Bu sefer build işleminin başarıyla tamamlanması gerekiyor.
 
