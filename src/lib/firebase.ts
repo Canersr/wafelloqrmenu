@@ -22,15 +22,10 @@ const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 const db = getFirestore(app);
 const auth: Auth = getAuth(app);
 
-// Immediately-invoked async function to handle persistence
-(async () => {
-  try {
-    // This function is asynchronous and returns a Promise.
-    // We must wait for it to complete before the auth object is used elsewhere.
-    await setPersistence(auth, browserSessionPersistence);
-  } catch (error) {
+// A promise that resolves once persistence is set
+const persistenceInitialized = setPersistence(auth, browserSessionPersistence).catch(error => {
     console.error("Firebase: Could not set session persistence.", error);
-  }
-})();
+});
 
-export { db, auth };
+
+export { db, auth, persistenceInitialized };

@@ -127,7 +127,7 @@ export default function CategoriesPage() {
       const categoryRef = doc(db, 'categories', category.id);
       batch.delete(categoryRef);
 
-      // Bu kategorideki tüm ürünleri bul ve sil
+      // Bu kategorideki tüm ürünleri bul ve silme işlemine ekle
       const menuItemsRef = collection(db, 'menuItems');
       const q = query(menuItemsRef, where('category', '==', category.name));
       const querySnapshot = await getDocs(q);

@@ -5,7 +5,7 @@ import { useEffect, useState, useRef, useCallback, type ReactNode } from 'react'
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { onAuthStateChanged, signOut, type User } from 'firebase/auth';
-import { auth } from '@/lib/firebase';
+import { auth, persistenceInitialized } from '@/lib/firebase';
 import { Loader2, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
@@ -78,17 +78,35 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
 
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      if (currentUser) {
-        setUser(currentUser);
-      } else {
-        router.push('/login');
-      }
-      setLoading(false);
+    const checkAuth = async () => {
+        // Wait for persistence to be set before subscribing to auth state changes.
+        await persistenceInitialized;
+        
+        const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+            if (currentUser) {
+                setUser(currentUser);
+            } else {
+                router.push('/login');
+            }
+            setLoading(false);
+        });
+
+        return unsubscribe;
+    };
+
+    let unsubscribe: (() => void) | undefined;
+    checkAuth().then(unsub => {
+        if (unsub) {
+            unsubscribe = unsub;
+        }
     });
 
-    return () => unsubscribe();
-  }, [router]);
+    return () => {
+        if (unsubscribe) {
+            unsubscribe();
+        }
+    };
+}, [router]);
   
   if (loading) {
     return (

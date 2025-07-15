@@ -60,7 +60,7 @@ export default function HomePage() {
         await navigator.share(shareData);
       } catch (error) {
         // This can happen if the user cancels the share dialog, so we don't need to show an error.
-        console.log('Share action was cancelled or failed', error);
+        console.log('Share action was cancelled or failed. Error:', error);
       }
     }
   };
@@ -73,10 +73,10 @@ export default function HomePage() {
     });
   };
 
-  const getSocialShareLink = (platform: SocialPlatform, url: string, text: string) => {
-    const menuUrl = `${url}/menu`;
+  const getSocialShareLink = (platform: SocialPlatform) => {
+    const menuUrl = `${siteUrl}/menu`;
     const encodedUrl = encodeURIComponent(menuUrl);
-    const encodedText = encodeURIComponent(text);
+    const encodedText = encodeURIComponent(shareData.text);
 
     switch (platform) {
       case 'whatsapp':
@@ -196,17 +196,17 @@ export default function HomePage() {
                      )}
                     <div className="grid grid-cols-2 gap-2">
                        <Button variant="outline" asChild>
-                         <a href={getSocialShareLink('whatsapp', siteUrl, shareData.text)} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp'ta Paylaş">
+                         <a href={getSocialShareLink('whatsapp')} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp'ta Paylaş">
                             <MessageCircle /> WhatsApp
                          </a>
                       </Button>
                       <Button variant="outline" asChild>
-                         <a href={getSocialShareLink('twitter', siteUrl, shareData.text)} target="_blank" rel="noopener noreferrer" aria-label="Twitter'da Paylaş">
+                         <a href={getSocialShareLink('twitter')} target="_blank" rel="noopener noreferrer" aria-label="Twitter'da Paylaş">
                            <Twitter /> Twitter
                          </a>
                       </Button>
                       <Button variant="outline" asChild>
-                         <a href={getSocialShareLink('facebook', siteUrl, shareData.text)} target="_blank" rel="noopener noreferrer" aria-label="Facebook'ta Paylaş">
+                         <a href={getSocialShareLink('facebook')} target="_blank" rel="noopener noreferrer" aria-label="Facebook'ta Paylaş">
                            <Facebook /> Facebook
                          </a>
                       </Button>
