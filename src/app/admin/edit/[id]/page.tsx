@@ -251,8 +251,12 @@ export default function EditMenuItemPage() {
     return (
       <Card>
         <CardHeader>
-          <Skeleton className="h-8 w-1/2" />
-          <Skeleton className="h-4 w-1/3" />
+          <CardTitle>
+            <Skeleton className="h-8 w-1/2" />
+          </CardTitle>
+          <CardDescription>
+            <Skeleton className="h-4 w-1/3" />
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="space-y-2">
@@ -316,7 +320,7 @@ export default function EditMenuItemPage() {
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder={isCategoriesLoading ? "Kategoriler yükleniyor..." : "Bir kategori seçin"} />
-                      </Trigger>
+                      </SelectTrigger>
                     </FormControl>
                     <SelectContent>
                       {categories.map((category) => (
@@ -415,5 +419,3 @@ export default function EditMenuItemPage() {
     </Card>
   );
 }
-
-    
