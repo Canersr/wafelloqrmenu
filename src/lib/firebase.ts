@@ -18,14 +18,26 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+let app;
+if (getApps().length === 0) {
+    if (!firebaseConfig.apiKey || !firebaseConfig.projectId) {
+        throw new Error("Firebase config is not set. Please create a .env.local file with your Firebase credentials or set them in your hosting provider's environment variables.");
+    }
+    app = initializeApp(firebaseConfig);
+} else {
+    app = getApp();
+}
+
 const db = getFirestore(app);
 const auth: Auth = getAuth(app);
 
-// A promise that resolves once persistence is set
-const persistenceInitialized = setPersistence(auth, browserSessionPersistence).catch(error => {
-    console.error("Firebase: Could not set session persistence.", error);
-});
+// A promise that resolves once persistence is set.
+// This should only run on the client-side.
+const persistenceInitialized = typeof window !== 'undefined' 
+    ? setPersistence(auth, browserSessionPersistence).catch(error => {
+        console.error("Firebase: Could not set session persistence.", error);
+      })
+    : Promise.resolve();
 
 
 export { db, auth, persistenceInitialized };
