@@ -10,7 +10,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 // This tells Next.js to statically generate this page and then
 // revalidate it in the background at most once every 60 seconds.
 // This ensures data stays fresh while providing instant load times for most users.
-export const revalidate = 60; 
+export const revalidate = 60;
 
 async function getMenuItems(): Promise<MenuItem[]> {
   try {
@@ -24,14 +24,27 @@ async function getMenuItems(): Promise<MenuItem[]> {
     return items;
   } catch (error) {
     console.error("Error fetching menu items: ", error);
-    // In case of an error, return an empty array to prevent the page from crashing.
-    // In a real application, more robust error logging could be implemented here.
     return [];
   }
 }
 
+async function getCategories(): Promise<string[]> {
+   try {
+    const categoriesCollection = collection(db, 'categories');
+    const q = query(categoriesCollection, orderBy('name'));
+    const querySnapshot = await getDocs(q);
+    const fetchedCategories = querySnapshot.docs.map(doc => doc.data().name as string);
+    return ['Tümü', ...fetchedCategories];
+  } catch (error) {
+    console.error("Error fetching categories: ", error);
+    return ['Tümü'];
+  }
+}
+
+
 export default async function MenuPage() {
   const menuItems = await getMenuItems();
+  const categories = await getCategories();
 
   return (
     <div className="flex flex-col min-h-dvh bg-background">
@@ -42,7 +55,7 @@ export default async function MenuPage() {
                 <p className="text-muted-foreground">Menüde gösterilecek ürün bulunamadı. Lütfen yönetim panelinden ürün ekleyin.</p>
             </div>
         ) : (
-          <Menu menuItems={menuItems} />
+          <Menu menuItems={menuItems} categories={categories} />
         )}
       </main>
     </div>

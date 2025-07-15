@@ -13,43 +13,17 @@ import {
   CarouselPrevious,
   type CarouselApi,
 } from '@/components/ui/carousel';
-import { collection, getDocs, orderBy, query } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
-import { Skeleton } from './ui/skeleton';
 
 interface MenuProps {
   menuItems: MenuItem[];
+  categories: string[];
 }
 
-type Category = string;
-
-export function Menu({ menuItems }: MenuProps) {
+export function Menu({ menuItems, categories }: MenuProps) {
   const [api, setApi] = useState<CarouselApi>();
   const [canScrollPrev, setCanScrollPrev] = useState(false);
   const [canScrollNext, setCanScrollNext] = useState(false);
-  const [categories, setCategories] = useState<Category[]>(['Tümü']);
-  const [isCategoriesLoading, setIsCategoriesLoading] = useState(true);
-
-  const [selectedCategory, setSelectedCategory] = useState<Category>('Tümü');
-
-  useEffect(() => {
-    const fetchCategories = async () => {
-      setIsCategoriesLoading(true);
-       try {
-        const categoriesCollection = collection(db, 'categories');
-        const q = query(categoriesCollection, orderBy('name'));
-        const querySnapshot = await getDocs(q);
-        const fetchedCategories = querySnapshot.docs.map(doc => doc.data().name as string);
-        setCategories(['Tümü', ...fetchedCategories]);
-      } catch (error) {
-        console.error("Error fetching categories: ", error);
-        // Silently fail, 'Tümü' will still be available
-      } finally {
-        setIsCategoriesLoading(false);
-      }
-    };
-    fetchCategories();
-  }, [])
+  const [selectedCategory, setSelectedCategory] = useState<string>('Tümü');
 
   const onSelect = useCallback((api: CarouselApi) => {
     if (!api) {
@@ -82,7 +56,7 @@ export function Menu({ menuItems }: MenuProps) {
     }
     const selectedIndex = categories.findIndex((c) => c === selectedCategory);
     if (selectedIndex !== -1) {
-      api.scrollTo(selectedIndex);
+      api.scrollTo(selectedIndex, true); // Add true for instant scroll
     }
   }, [api, selectedCategory, categories]);
 
@@ -93,41 +67,26 @@ export function Menu({ menuItems }: MenuProps) {
     return menuItems.filter((item) => item.category === selectedCategory);
   }, [menuItems, selectedCategory]);
 
-  const handleCategoryClick = (category: Category) => {
+  const handleCategoryClick = (category: string) => {
     setSelectedCategory(category);
   };
   
   const handlePreviousClick = useCallback(() => {
-    const currentIndex = categories.findIndex((c) => c === selectedCategory);
-    if (currentIndex > 0) {
-      const newCategory = categories[currentIndex - 1];
-      setSelectedCategory(newCategory);
-    }
-  }, [categories, selectedCategory]);
+    api?.scrollPrev();
+  }, [api]);
 
   const handleNextClick = useCallback(() => {
-    const currentIndex = categories.findIndex((c) => c === selectedCategory);
-    if (currentIndex < categories.length - 1) {
-      const newCategory = categories[currentIndex + 1];
-      setSelectedCategory(newCategory);
-    }
-  }, [categories, selectedCategory]);
+    api?.scrollNext();
+  }, [api]);
 
 
   return (
     <section id="menu" className="-mt-8 relative z-10">
       <div className="container mx-auto px-4">
-        {isCategoriesLoading ? (
-            <div className="flex space-x-2 mb-8 h-10">
-                <Skeleton className="h-full w-20 rounded-full" />
-                <Skeleton className="h-full w-28 rounded-full" />
-                <Skeleton className="h-full w-32 rounded-full" />
-                <Skeleton className="h-full w-24 rounded-full" />
-            </div>
-        ) : (
+        {categories.length > 1 && (
           <Carousel 
             setApi={setApi} 
-            opts={{ align: 'start', slidesToScroll: 1, draggable: false }} 
+            opts={{ align: 'start', slidesToScroll: 'auto', containScroll: 'trimSnaps' }} 
             className="w-full mb-8"
           >
             <div className="relative">
