@@ -36,7 +36,6 @@ export const allCategories = [
   'Çikolatalı Lezzetler',
   'Klasik Waffle',
   'İçecekler',
-  'a'
 ];
 
 
@@ -95,14 +94,5 @@ export const allMenuItems: MenuItem[] = [
     category: 'İçecekler',
     imageUrl: '/images/menu/soguk-kahve.webp',
     aiHint: 'iced coffee'
-  },
-  {
-    id: 'caner',
-    name: 'caner',
-    description: 'Taze sıkılmış limonlardan hazırlanan, ferahlatıcı ve doğal ev yapımı limonata.',
-    price: 90.00,
-    category: 'a',
-    imageUrl: '/images/menu/limonata.webp',
-    aiHint: 'lemonade'
   }
 ];
