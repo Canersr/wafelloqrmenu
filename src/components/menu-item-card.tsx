@@ -8,38 +8,28 @@ interface MenuItemCardProps {
   item: MenuItem;
 }
 
-const getOptimizedCloudinaryUrl = (url: string) => {
-  // Check if it's a placeholder URL
-  if (!url || !url.includes('res.cloudinary.com/')) {
-    return url;
-  }
-  
-  const parts = url.split('/upload/');
-  if (parts.length !== 2) {
-    return url;
-  }
-  
-  // Apply transformations for optimization
-  const transformations = 'w_600,h_400,c_fill,q_auto,f_auto';
-  
-  return `${parts[0]}/upload/${transformations}/${parts[1]}`;
-};
-
 export function MenuItemCard({ item }: MenuItemCardProps) {
   const hint = item.aiHint ?? item.name.split(' ').slice(0, 2).join(' ').toLowerCase();
-  const optimizedImageUrl = getOptimizedCloudinaryUrl(item.imageUrl);
+  
+  // Use a placeholder if the local image doesn't exist.
+  // In a real app, you might want a more robust check.
+  const imageUrl = item.imageUrl || 'https://placehold.co/600x400.png';
 
   return (
     <Card className="overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 flex flex-col h-full bg-card border-none rounded-xl">
       <CardHeader className="p-0 relative aspect-video">
         <Image
-          src={optimizedImageUrl}
+          src={imageUrl}
           alt={item.name}
           fill
           className="object-cover rounded-t-xl"
           data-ai-hint={hint}
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-          priority={false} 
+          priority={false}
+          // Add onError to handle cases where the local image is missing
+          onError={(e) => {
+            e.currentTarget.src = 'https://placehold.co/600x400.png';
+          }}
         />
       </CardHeader>
       <CardContent className="p-4 flex-grow flex flex-col bg-white dark:bg-card">

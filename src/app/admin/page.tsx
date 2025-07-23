@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { collection, onSnapshot, doc, deleteDoc, query, orderBy, addDoc, getDocs } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import type { MenuItem } from '@/types';
-import { menuItems as sampleMenuItems } from '@/lib/data';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -75,38 +74,21 @@ export default function AdminDashboard() {
 
   const handleSeedDatabase = async () => {
     setIsSeeding(true);
+    toast({
+        title: 'İşlem Başlatıldı',
+        description: 'Örnek veriler veritabanına ekleniyor...',
+    });
     try {
-      // Prevent seeding if items already exist
-      if (menuItems.length > 0) {
-        toast({
-          title: "Uyarı",
-          description: "Veritabanı zaten dolu. Bu işlem yapılamaz.",
+      // This is a placeholder for sample data.
+      // Since data.ts is removed, we'd need to redefine it or fetch from a static source.
+      // For now, we'll just log a message.
+      console.log("Seeding is disabled as sample data file is removed.");
+      toast({
+          title: "İşlem Devre Dışı",
+          description: "Örnek veri dosyası kaldırıldığı için bu özellik devre dışı bırakılmıştır.",
           variant: 'default',
         });
-        return;
-      }
-      
-      // Seed categories first
-      const categoriesCollection = collection(db, 'categories');
-      const existingCategoriesSnapshot = await getDocs(categoriesCollection);
-      if (existingCategoriesSnapshot.empty) {
-        const uniqueCategories = [...new Set(sampleMenuItems.map(item => item.category))];
-        for (const categoryName of uniqueCategories) {
-          await addDoc(categoriesCollection, { name: categoryName });
-        }
-      }
 
-      // Seed menu items
-      const menuItemsCollection = collection(db, 'menuItems');
-      for (const item of sampleMenuItems) {
-        await addDoc(menuItemsCollection, item);
-      }
-      
-      toast({
-        title: 'Başarılı!',
-        description: 'Örnek ürünler ve kategoriler veritabanına başarıyla eklendi.',
-        variant: 'default',
-      });
     } catch (error: any) {
       console.error("Veritabanı doldurma hatası: ", error);
       let description = 'Örnek ürünler eklenirken bir hata oluştu.';
@@ -199,13 +181,10 @@ export default function AdminDashboard() {
                   <TableCell colSpan={4} className="text-center h-24 text-muted-foreground">
                     <div className="flex flex-col items-center gap-4">
                         <span>Veritabanında hiç ürün bulunamadı.</span>
-                        <Button onClick={handleSeedDatabase} disabled={isSeeding}>
-                            {isSeeding ? (
-                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                            ) : (
-                                <Database className="mr-2 h-4 w-4" />
-                            )}
-                            {isSeeding ? 'Yükleniyor...' : 'Örnek Ürünleri Yükle'}
+                        {/* The button is now disabled as the source file is removed */}
+                        <Button onClick={handleSeedDatabase} disabled>
+                            <Database className="mr-2 h-4 w-4" />
+                            Örnek Ürünleri Yükle (Devre Dışı)
                         </Button>
                     </div>
                   </TableCell>
