@@ -1,5 +1,5 @@
 // src/lib/firebase.ts
-import { initializeApp, getApps, getApp } from 'firebase/app';
+import { initializeApp, getApps, getApp, type FirebaseApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
 import { 
   getAuth, 
@@ -18,26 +18,23 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-let app;
-if (getApps().length === 0) {
-    if (!firebaseConfig.apiKey || !firebaseConfig.projectId) {
-        throw new Error("Firebase config is not set. Please create a .env.local file with your Firebase credentials or set them in your hosting provider's environment variables.");
-    }
-    app = initializeApp(firebaseConfig);
-} else {
-    app = getApp();
-}
+const app: FirebaseApp = getApps().length 
+    ? getApp() 
+    : initializeApp(firebaseConfig);
 
-const db = getFirestore(app);
 const auth: Auth = getAuth(app);
+const db = getFirestore(app);
 
 // A promise that resolves once persistence is set.
 // This should only run on the client-side.
-const persistenceInitialized = typeof window !== 'undefined' 
-    ? setPersistence(auth, browserSessionPersistence).catch(error => {
-        console.error("Firebase: Could not set session persistence.", error);
-      })
-    : Promise.resolve();
-
+const persistenceInitialized = (async () => {
+    if (typeof window !== 'undefined') {
+        try {
+            await setPersistence(auth, browserSessionPersistence);
+        } catch (error) {
+            console.error("Firebase: Could not set session persistence.", error);
+        }
+    }
+})();
 
 export { db, auth, persistenceInitialized };
