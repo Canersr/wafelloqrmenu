@@ -25,7 +25,6 @@ import {
 import QRCode from 'qrcode.react';
 import { useToast } from '@/hooks/use-toast';
 import { useState, useEffect } from 'react';
-import { Loader2 } from 'lucide-react';
 
 // Define a type for social media platforms
 type SocialPlatform = 'whatsapp' | 'twitter' | 'facebook';
@@ -42,8 +41,7 @@ export default function HomePage() {
   const siteUrl = 'https://wafelloqr.com';
 
   useEffect(() => {
-    // This effect ensures that client-side APIs like `navigator.share` are only checked
-    // after the component has mounted on the client.
+    // This effect ensures that client-side APIs are only called after component mount.
     setIsClient(true);
   }, []);
 
@@ -66,11 +64,13 @@ export default function HomePage() {
   };
 
   const handleCopyLink = () => {
-    navigator.clipboard.writeText(`${siteUrl}/menu`);
-    toast({
-      title: 'Kopyalandı!',
-      description: 'Menü linki panoya kopyalandı.',
-    });
+    if (typeof window !== 'undefined') {
+        navigator.clipboard.writeText(`${siteUrl}/menu`);
+        toast({
+            title: 'Kopyalandı!',
+            description: 'Menü linki panoya kopyalandı.',
+        });
+    }
   };
 
   const getSocialShareLink = (platform: SocialPlatform) => {
@@ -173,14 +173,16 @@ export default function HomePage() {
                 </DialogHeader>
                 <div className="flex flex-col items-center gap-6 py-4">
                   <div className="p-4 bg-white rounded-lg border">
-                    <QRCode
-                      value={`${siteUrl}/menu`}
-                      size={160}
-                      bgColor="#ffffff"
-                      fgColor="#000000"
-                      level="Q"
-                      includeMargin={false}
-                    />
+                    {isClient && (
+                      <QRCode
+                        value={`${siteUrl}/menu`}
+                        size={160}
+                        bgColor="#ffffff"
+                        fgColor="#000000"
+                        level="Q"
+                        includeMargin={false}
+                      />
+                    )}
                   </div>
                   <div className="w-full flex flex-col gap-3">
                      <div className="relative flex py-2 items-center">

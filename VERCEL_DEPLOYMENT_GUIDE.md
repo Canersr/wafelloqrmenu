@@ -1,75 +1,36 @@
-
 # Vercel'de Projeyi Yayınlama Rehberi
 
-Merhaba! Bu rehber, projenizi Vercel'de başarıyla yayınlarken karşılaştığınız `auth/invalid-api-key` hatasını çözmek için hazırlanmıştır. 
+Merhaba! Bu rehber, projenizi Vercel'de başarıyla yayınlamanıza yardımcı olmak için hazırlanmıştır. Projeniz artık veritabanı veya harici servisler kullanmadığı için yapılandırma oldukça basittir.
 
-**Önemli Not:** Sorun kodda değil, Vercel'in projenizin gizli anahtarlarını (API Key vb.) bilmemesinden kaynaklanıyor. Güvenlik nedeniyle bu anahtarlar doğrudan koda yazılamaz. Bu bilgileri, aşağıda anlatıldığı gibi Vercel'in güvenli "Environment Variables" (Ortam Değişkenleri) paneline sizin eklemeniz gerekmektedir.
+**Önemli Not:** Artık Firebase veya Cloudinary için herhangi bir Ortam Değişkeni (Environment Variables) girmenize **GEREK YOKTUR**. Proje tamamen statik hale getirilmiştir.
 
-Lütfen aşağıdaki adımları dikkatlice takip edin.
-
----
-
-### Adım 1: Firebase Proje Ayarlarını Açın
-
-1.  [Firebase Konsolu'na](https://console.firebase.google.com/) gidin.
-2.  `Wafello` projenizi seçin.
-3.  Sol üst köşedeki **çark simgesine (⚙️)** tıklayın ve **Project settings (Proje Ayarları)** seçeneğini seçin.
+Eğer daha önceki denemelerinizden kalma ortam değişkenleri varsa, bunları Vercel projenizin ayarlarından silebilirsiniz. Bu, olası kafa karışıklıklarını önleyecektir.
 
 ---
 
-### Adım 2: Firebase Gizli Anahtarlarını Bulun ve Kopyalayın
+### Projeyi Vercel'e Nasıl Yüklerim?
 
-1.  **General (Genel)** sekmesinde, sayfanın altına doğru kaydırın.
-2.  **Your apps (Uygulamalarınız)** bölümünde, web uygulamanızı (`wafelloqr.com` veya benzeri) göreceksiniz.
-3.  **SDK setup and configuration (SDK kurulumu ve yapılandırması)** bölümünde, **Config (Yapılandırma)** seçeneğini seçin.
-4.  Aşağıdaki resimde gösterilen `firebaseConfig` objesinin içindeki anahtarları ve değerlerini kopyalamanız gerekecek.
+1.  **GitHub'a Yükleyin:** Projenizin kodlarını bir GitHub deposuna (repository) yükleyin.
+2.  **Vercel'e Giriş Yapın:** [Vercel Paneli'ne](https://vercel.com/dashboard) gidin ve GitHub hesabınızla giriş yapın.
+3.  **Yeni Proje Ekleyin:** "Add New... > Project" butonuna tıklayın.
+4.  **GitHub Deponuzu Seçin:** Projenizi yüklediğiniz GitHub deposunu bulun ve "Import" butonuna tıklayın.
+5.  **Yapılandırma:** Vercel, projenizin bir Next.js projesi olduğunu otomatik olarak algılayacaktır. Herhangi bir ayarı değiştirmenize gerek yok. "Framework Preset" olarak "Next.js" seçili olmalıdır.
+6.  **Dağıtın (Deploy):** "Deploy" butonuna tıklayın.
 
----
-
-### Adım 3: Cloudinary Bilgilerini Bulun
-
-1.  [Cloudinary Paneli'ne](https://cloudinary.com/console) gidin.
-2.  Panonuzda (Dashboard), `Cloud Name` gibi bilgileri göreceksiniz.
-3.  **Settings (Ayarlar) > Upload (Yükleme)** sekmesine gidin.
-4.  Sayfanın altında **Upload presets (Yükleme ön ayarları)** bölümünü bulun ve Wafello için oluşturduğunuz preset'in adını not alın.
+Vercel, projenizi otomatik olarak derleyecek ve size bir URL verecektir. İşlem bu kadar basit!
 
 ---
 
-### Adım 4: Vercel'e Ortam Değişkenlerini Girin
+### Menüyü Nasıl Güncellerim?
 
-Bu en önemli adımdır.
+Tüm menü yönetimi artık doğrudan kod içerisinden yapılmaktadır.
 
-1.  [Vercel Paneli'ne](https://vercel.com/dashboard) gidin ve `wafello` projenizi seçin.
-2.  **Settings (Ayarlar)** sekmesine tıklayın.
-3.  Soldaki menüden **Environment Variables (Ortam Değişkenleri)** seçeneğini seçin.
-4.  Aşağıdaki **TÜM** anahtarları ve Firebase/Cloudinary'den kopyaladığınız karşılık gelen değerleri **tek tek** ekleyin. **Herhangi birini atlamadığınızdan emin olun.**
+1.  **VS Code'u Açın:** Projenizi VS Code veya tercih ettiğiniz bir kod düzenleyicide açın.
+2.  **Menü Veri Dosyasını Bulun:** `src/lib/menu-data.ts` dosyasını açın.
+3.  **Değişiklikleri Yapın:** Bu dosyanın içindeki `allMenuItems` dizisini düzenleyerek ürün ekleyebilir, silebilir veya mevcut ürünleri güncelleyebilirsiniz. Dosyanın en üstündeki talimatlar size yol gösterecektir.
+4.  **Resimleri Ekleyin:** Ürün resimlerinizi `public/images/menu/` klasörüne ekleyin.
+5.  **Değişiklikleri GitHub'a Gönderin:** Yaptığınız değişiklikleri kaydedip GitHub deponuza gönderin (`git add .`, `git commit -m "menü güncellendi"`, `git push`).
 
-**Firebase Değişkenleri:**
-
-| Anahtar (KEY)                               | Değer (VALUE)                                  |
-| ------------------------------------------- | ---------------------------------------------- |
-| `NEXT_PUBLIC_FIREBASE_API_KEY`              | *Firebase'den kopyaladığınız apiKey*           |
-| `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN`          | *Firebase'den kopyaladığınız authDomain*       |
-| `NEXT_PUBLIC_FIREBASE_PROJECT_ID`           | *Firebase'den kopyaladığınız projectId*        |
-| `NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET`       | *Firebase'den kopyaladığınız storageBucket*    |
-| `NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID`  | *Firebase'den kopyaladığınız messagingSenderId* |
-| `NEXT_PUBLIC_FIREBASE_APP_ID`               | *Firebase'den kopyaladığınız appId*            |
-
-**Cloudinary Değişkenleri (Resim Yükleme İçin Gerekli):**
-
-| Anahtar (KEY)                             | Değer (VALUE)                                       |
-| ----------------------------------------- | --------------------------------------------------- |
-| `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME`       | *Cloudinary panonuzdaki Cloud Name*                 |
-| `NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET`    | *Cloudinary'deki Upload Preset adınız*              |
-
----
-
-### Adım 5: Projeyi Yeniden Dağıtın (Redeploy)
-
-1.  Tüm ortam değişkenlerini kaydettikten sonra, Vercel projenizin **Deployments (Dağıtımlar)** sekmesine gidin.
-2.  En son, başarısız olan dağıtımın yanındaki **üç nokta (...)** menüsüne tıklayın.
-3.  **Redeploy** seçeneğini seçin.
-
-Bu işlem, Vercel'in projenizi yeni eklediğiniz ortam değişkenleriyle birlikte sıfırdan derlemesini sağlayacaktır. Bu sefer build işleminin başarıyla tamamlanması gerekiyor.
+Vercel, GitHub deponuzdaki bu yeni değişiklikleri otomatik olarak algılayacak ve sitenizi saniyeler içinde güncelleyecektir.
 
 Başarılar!
