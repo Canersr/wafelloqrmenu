@@ -9,6 +9,7 @@ interface MenuItemCardProps {
 }
 
 const getOptimizedCloudinaryUrl = (url: string) => {
+  // Check if it's a placeholder URL
   if (!url || !url.includes('res.cloudinary.com/')) {
     return url;
   }
@@ -18,7 +19,8 @@ const getOptimizedCloudinaryUrl = (url: string) => {
     return url;
   }
   
-  const transformations = 'w_400,c_fill,q_auto,f_auto';
+  // Apply transformations for optimization
+  const transformations = 'w_600,h_400,c_fill,q_auto,f_auto';
   
   return `${parts[0]}/upload/${transformations}/${parts[1]}`;
 };
@@ -29,7 +31,7 @@ export function MenuItemCard({ item }: MenuItemCardProps) {
 
   return (
     <Card className="overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 flex flex-col h-full bg-card border-none rounded-xl">
-      <CardHeader className="p-0 relative h-48">
+      <CardHeader className="p-0 relative aspect-video">
         <Image
           src={optimizedImageUrl}
           alt={item.name}
@@ -37,9 +39,10 @@ export function MenuItemCard({ item }: MenuItemCardProps) {
           className="object-cover rounded-t-xl"
           data-ai-hint={hint}
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+          priority={false} 
         />
       </CardHeader>
-      <CardContent className="p-4 flex-grow flex flex-col bg-white">
+      <CardContent className="p-4 flex-grow flex flex-col bg-white dark:bg-card">
         <div className="flex-grow">
           <CardTitle className="text-lg font-bold text-card-foreground">{item.name}</CardTitle>
           <p className="text-sm text-muted-foreground mt-1">{item.description}</p>

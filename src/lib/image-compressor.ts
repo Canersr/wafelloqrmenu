@@ -10,7 +10,11 @@ export async function compressImage(file: File): Promise<File> {
 
   try {
     const compressedFile = await imageCompression(file, options);
-    return compressedFile;
+    // Return a new File object with a .webp extension
+    return new File([compressedFile], `${file.name.split('.')[0]}.webp`, {
+        type: 'image/webp',
+        lastModified: Date.now(),
+    });
   } catch (error) {
     console.error('Image compression failed:', error);
     // If compression fails for any reason, fall back to the original file
