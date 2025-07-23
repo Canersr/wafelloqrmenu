@@ -5,28 +5,41 @@ import type { MenuItem } from '@/types';
  * MENU DATA MANAGEMENT
  * =================================================================================
  * 
- * Bu dosya, menünüzdeki tüm ürünlerin merkezi olarak yönetildiği yerdir.
+ * Bu dosya, menünüzdeki tüm ürünlerin ve kategorilerin merkezi olarak 
+ * yönetildiği yerdir.
+ * 
+ * ---------------------------------------------------------------------------------
+ * YENİ KATEGORİ EKLEME/SİLME/SIRALAMA
+ * ---------------------------------------------------------------------------------
+ * 1. Aşağıdaki `allCategories` dizisini düzenleyerek kategorileri yönetebilirsiniz.
+ * 2. Dizideki elemanların sırası, menü sayfasındaki kategori sırasını belirler.
+ * 3. İlk kategori olan "Tümü" genellikle sabit kalmalıdır.
  * 
  * ---------------------------------------------------------------------------------
  * YENİ ÜRÜN NASIL EKLENİR?
  * ---------------------------------------------------------------------------------
  * 1. Aşağıdaki `allMenuItems` dizisinin içine yeni bir obje olarak ürününüzü ekleyin.
- * 2. `id` alanını benzersiz bir metin olarak belirleyin (örn: "klasik-waffle-1").
- * 3. `name`, `description`, `price` ve `category` alanlarını doldurun.
- * 4. `imageUrl` için, `public/images/menu/` klasörüne koyduğunuz resmin adını yazın.
- *    Örneğin, resminizin adı `cikolatali-ruya.webp` ise, `imageUrl` şöyle olmalıdır:
- *    `imageUrl: '/images/menu/cikolatali-ruya.webp'`
- * 
- * ---------------------------------------------------------------------------------
- * YENİ KATEGORİ NASIL EKLENİR?
- * ---------------------------------------------------------------------------------
- * 1. `allCategories` dizisine yeni kategorinizin adını ekleyin.
- * 2. Yeni ürününüzün `category` alanına bu yeni kategori adını yazın.
- *
- * Not: "Tümü" kategorisi otomatik olarak eklenir, onu manuel olarak eklemenize gerek yoktur.
+ * 2. `id` alanını benzersiz bir metin olarak belirleyin (örn: "yeni-waffle-1").
+ * 3. `name`, `description`, `price` alanlarını doldurun.
+ * 4. `category` alanına, ürünün ait olduğu ve yukarıdaki `allCategories` 
+ *    dizisinde tanımladığınız kategorinin adını yazın.
+ * 5. `imageUrl` için, `public/images/menu/` klasörüne koyduğunuz resmin adını yazın.
+ *    Örneğin, resmin adı `yeni-waffle.webp` ise, `imageUrl` şöyle olmalıdır:
+ *    `imageUrl: '/images/menu/yeni-waffle.webp'`
  * =================================================================================
  */
 
+// 1. ADIM: Kategorilerinizi buradan yönetin. Sıralama önemlidir.
+export const allCategories = [
+  'Tümü',
+  'Meyveli Waffle',
+  'Çikolatalı Lezzetler',
+  'Klasik Waffle',
+  'İçecekler',
+];
+
+
+// 2. ADIM: Ürünlerinizi buraya ekleyin.
 export const allMenuItems: MenuItem[] = [
   {
     id: 'cilekli-ruya',
@@ -82,9 +95,13 @@ export const allMenuItems: MenuItem[] = [
     imageUrl: '/images/menu/soguk-kahve.webp',
     aiHint: 'iced coffee'
   },
+  {
+    id: 'caner',
+    name: 'caner',
+    description: 'Taze sıkılmış limonlardan hazırlanan, ferahlatıcı ve doğal ev yapımı limonata.',
+    price: 90.00,
+    category: 'İçecekler',
+    imageUrl: '/images/menu/limonata.webp',
+    aiHint: 'lemonade'
+  }
 ];
-
-// Menünüzdeki tüm kategorileri buradan yönetin.
-// "Tümü" otomatik olarak eklenecektir.
-const uniqueCategories = [...new Set(allMenuItems.map(item => item.category))];
-export const allCategories = ['Tümü', ...uniqueCategories];
