@@ -38,7 +38,6 @@ import { useEffect, useState } from 'react';
 import { Loader2, Sparkles } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import Image from 'next/image';
-import { compressImage } from '@/lib/image-compressor';
 import { generateDescription } from '@/ai/flows/generate-description';
 
 
@@ -58,11 +57,8 @@ export default function EditMenuItemPage() {
   const itemId = params.id as string;
   const [loading, setLoading] = useState(false);
   const [isAiLoading, setIsAiLoading] = useState(false);
-  const [isCompressing, setIsCompressing] = useState(false);
   const [fetching, setFetching] = useState(true);
   const [item, setItem] = useState<MenuItem | null>(null);
-  const [imageFile, setImageFile] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [categories, setCategories] = useState<string[]>([]);
   const [isCategoriesLoading, setIsCategoriesLoading] = useState(true);
 
@@ -104,9 +100,6 @@ export default function EditMenuItemPage() {
           const data = docSnap.data() as Omit<MenuItem, 'id'>;
           setItem({ id: docSnap.id, ...data });
           form.reset(data);
-          if (data.imageUrl) {
-            setImagePreview(data.imageUrl);
-          }
         } else {
           toast({
             title: 'Hata',
@@ -129,29 +122,6 @@ export default function EditMenuItemPage() {
 
     fetchItem();
   }, [itemId, form, router, toast]);
-
-  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setImageFile(null);
-      const previewUrl = URL.createObjectURL(file);
-      setImagePreview(previewUrl);
-      setIsCompressing(true);
-      try {
-        const compressedFile = await compressImage(file);
-        setImageFile(compressedFile);
-      } catch (error) {
-        toast({
-          title: 'Uyarı',
-          description: 'Resim sıkıştırılamadı, orijinal dosya kullanılacak. Yükleme biraz daha uzun sürebilir.',
-          variant: 'default',
-        });
-        setImageFile(file);
-      } finally {
-        setIsCompressing(false);
-      }
-    }
-  };
 
   const handleGenerateDescription = async () => {
     const productName = form.getValues('name');
@@ -189,38 +159,11 @@ export default function EditMenuItemPage() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     if (!itemId || !item) return;
     setLoading(true);
-    let imageUrl = item.imageUrl;
-
+    
     try {
-      if (imageFile) {
-        const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
-        const uploadPreset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
-
-        if (!cloudName || !uploadPreset) {
-            throw new Error('Cloudinary cloud name or upload preset is not configured in environment variables.');
-        }
-
-        const formData = new FormData();
-        formData.append('file', imageFile);
-        formData.append('upload_preset', uploadPreset);
-        
-        const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
-            method: 'POST',
-            body: formData,
-        });
-        
-        if (!res.ok) {
-            const errorText = await res.text();
-            console.error('Cloudinary upload error:', errorText);
-            throw new Error('Resim yüklemesi başarısız oldu.');
-        }
-        
-        const data = await res.json();
-        imageUrl = data.secure_url;
-      }
-
       const docRef = doc(db, 'menuItems', itemId);
-      await updateDoc(docRef, { ...values, imageUrl: imageUrl, aiHint: values.name.split(' ').slice(0, 2).join(' ').toLowerCase() });
+      // Not updating imageUrl here, as it's managed from the data file now.
+      await updateDoc(docRef, { ...values, aiHint: values.name.split(' ').slice(0, 2).join(' ').toLowerCase() });
       toast({
         title: 'Başarılı!',
         description: 'Ürün başarıyla güncellendi.',
@@ -230,11 +173,7 @@ export default function EditMenuItemPage() {
     } catch (error: any) {
       console.error('Güncelleme hatası: ', error);
       let description = 'Ürün güncellenirken bir hata oluştu.';
-      if (error.message.includes('Cloudinary cloud name or upload preset')) {
-        description = 'Sunucu tarafında Cloudinary ayarları eksik. Lütfen .env dosyasındaki NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME ve NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET değişkenlerini kontrol edin.';
-      } else if (error.message.includes('Resim yüklemesi başarısız oldu')) {
-        description = 'Resim yüklenemedi. Lütfen Cloudinary ayarlarınızı ve internet bağlantınızı kontrol edin.';
-      } else if (error.code === 'permission-denied') {
+      if (error.code === 'permission-denied') {
         description = 'Veritabanına yazma izniniz yok. Lütfen Firebase kurallarınızı kontrol edin.';
       }
       toast({
@@ -288,11 +227,20 @@ export default function EditMenuItemPage() {
     <Card>
       <CardHeader>
         <CardTitle>Ürünü Düzenle</CardTitle>
-        <CardDescription>"{item.name}" adlı ürünü güncelleyin.</CardDescription>
+        <CardDescription>"{item.name}" adlı ürünü güncelleyin. Resimler kod dosyasından (`src/lib/data.ts`) yönetilecektir.</CardDescription>
       </CardHeader>
       <CardContent>
+        {item.imageUrl && (
+            <div>
+                <p className="text-sm font-medium mb-2">Mevcut Resim</p>
+                <div className="relative w-full aspect-video rounded-md overflow-hidden border">
+                <Image src={item.imageUrl} alt="Mevcut resim" fill className="object-cover" />
+                </div>
+                <p className='text-xs text-muted-foreground mt-2'>Resmi değiştirmek için `src/lib/data.ts` dosyasını güncelleyin.</p>
+            </div>
+        )}
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 mt-6">
             <FormField
               control={form.control}
               name="name"
@@ -381,36 +329,18 @@ export default function EditMenuItemPage() {
               )}
             />
 
-            <FormItem>
-              <FormLabel>Ürün Resmi</FormLabel>
-              <FormControl>
-                <Input type="file" accept="image/*" onChange={handleImageChange} className="cursor-pointer" disabled={isCompressing}/>
-              </FormControl>
-              {isCompressing && <p className="text-sm text-muted-foreground mt-2">Resim optimize ediliyor, lütfen bekleyin...</p>}
-              <FormMessage />
-            </FormItem>
-
-            {imagePreview && (
-              <div>
-                <FormLabel>Resim Önizlemesi</FormLabel>
-                <div className="mt-2 relative w-full aspect-video rounded-md overflow-hidden">
-                  <Image src={imagePreview} alt="Mevcut veya seçilen resmin önizlemesi" fill className="object-cover" />
-                </div>
-              </div>
-            )}
-
             <div className="flex justify-end gap-4">
               <Button
                 type="button"
                 variant="outline"
                 onClick={() => router.back()}
-                disabled={loading || isCompressing || isAiLoading}
+                disabled={loading || isAiLoading}
               >
                 İptal
               </Button>
-              <Button type="submit" disabled={loading || isCompressing || isAiLoading || !imagePreview}>
-                {(loading || isCompressing) && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                {isCompressing ? 'Resim Hazırlanıyor...' : loading ? 'Güncelleniyor...' : 'Güncelle'}
+              <Button type="submit" disabled={loading || isAiLoading}>
+                {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                {loading ? 'Güncelleniyor...' : 'Güncelle'}
               </Button>
             </div>
           </form>

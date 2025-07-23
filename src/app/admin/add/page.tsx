@@ -35,8 +35,6 @@ import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, Sparkles } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import Image from 'next/image';
-import { compressImage } from '@/lib/image-compressor';
 import { generateDescription } from '@/ai/flows/generate-description';
 
 const formSchema = z.object({
@@ -53,9 +51,6 @@ export default function AddMenuItemPage() {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [isAiLoading, setIsAiLoading] = useState(false);
-  const [isCompressing, setIsCompressing] = useState(false);
-  const [imageFile, setImageFile] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [categories, setCategories] = useState<string[]>([]);
   const [isCategoriesLoading, setIsCategoriesLoading] = useState(true);
 
@@ -97,28 +92,6 @@ export default function AddMenuItemPage() {
     fetchCategories();
   }, [toast]);
   
-  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setImageFile(null); // Reset previous file
-      const previewUrl = URL.createObjectURL(file);
-      setImagePreview(previewUrl); // Show preview instantly
-      setIsCompressing(true);
-      try {
-        const compressedFile = await compressImage(file);
-        setImageFile(compressedFile);
-      } catch (error) {
-        toast({
-            title: 'Uyarı',
-            description: 'Resim sıkıştırılamadı, orijinal dosya kullanılacak. Yükleme biraz daha uzun sürebilir.',
-            variant: 'default',
-        });
-        setImageFile(file); // Fallback to original file
-      } finally {
-        setIsCompressing(false);
-      }
-    }
-  };
 
   const handleGenerateDescription = async () => {
     const productName = form.getValues('name');
@@ -155,53 +128,17 @@ export default function AddMenuItemPage() {
 
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    if (!imageFile) {
-        toast({
-            title: 'Hata!',
-            description: 'Lütfen bir ürün resmi seçin.',
-            variant: 'destructive',
-        });
-        return;
-    }
-
     setLoading(true);
-    let imageUrl = '';
-
     try {
-        const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
-        const uploadPreset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
-
-        if (!cloudName || !uploadPreset) {
-            throw new Error('Cloudinary cloud name or upload preset is not configured in environment variables.');
-        }
-
-        const formData = new FormData();
-        formData.append('file', imageFile);
-        formData.append('upload_preset', uploadPreset);
-        
-        const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
-            method: 'POST',
-            body: formData,
-        });
-        
-        if (!res.ok) {
-            const errorText = await res.text();
-            console.error('Cloudinary upload error:', errorText);
-            throw new Error('Resim yüklemesi başarısız oldu.');
-        }
-        
-        const data = await res.json();
-        imageUrl = data.secure_url;
-
         await addDoc(collection(db, 'menuItems'), {
             ...values,
-            imageUrl: imageUrl,
+            imageUrl: 'https://placehold.co/600x400.png', // Placeholder image
             aiHint: values.name.split(' ').slice(0, 2).join(' ').toLowerCase(),
         });
 
         toast({
             title: 'Başarılı!',
-            description: 'Yeni ürün menüye başarıyla eklendi.',
+            description: 'Yeni ürün menüye başarıyla eklendi. Resmi koddan güncellemeyi unutmayın.',
             variant: 'default',
         });
         router.push('/admin');
@@ -209,11 +146,7 @@ export default function AddMenuItemPage() {
     } catch (error: any) {
         console.error('Ekleme hatası: ', error);
         let description = 'Ürün eklenirken bir hata oluştu.';
-        if (error.message.includes('Cloudinary cloud name or upload preset')) {
-          description = 'Sunucu tarafında Cloudinary ayarları eksik. Lütfen .env dosyasındaki NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME ve NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET değişkenlerini kontrol edin.';
-        } else if (error.message.includes('Resim yüklemesi başarısız oldu')) {
-          description = 'Resim yüklenemedi. Lütfen Cloudinary ayarlarınızı ve internet bağlantınızı kontrol edin.';
-        } else if (error.code === 'permission-denied') {
+        if (error.code === 'permission-denied') {
           description = 'Veritabanına yazma izniniz yok. Lütfen Firebase kurallarınızı kontrol edin.';
         }
         toast({
@@ -230,7 +163,7 @@ export default function AddMenuItemPage() {
     <Card>
       <CardHeader>
         <CardTitle>Yeni Ürün Ekle</CardTitle>
-        <CardDescription>Menünüze yeni bir ürün ekleyin.</CardDescription>
+        <CardDescription>Menünüze yeni bir ürün ekleyin. Resimler kod dosyasından (`src/lib/data.ts`) yönetilecektir.</CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -323,36 +256,18 @@ export default function AddMenuItemPage() {
               )}
             />
 
-            <FormItem>
-              <FormLabel>Ürün Resmi</FormLabel>
-              <FormControl>
-                <Input type="file" accept="image/*" onChange={handleImageChange} className="cursor-pointer" disabled={isCompressing}/>
-              </FormControl>
-              {isCompressing && <p className="text-sm text-muted-foreground mt-2">Resim optimize ediliyor, lütfen bekleyin...</p>}
-              <FormMessage />
-            </FormItem>
-
-            {imagePreview && (
-              <div>
-                <FormLabel>Resim Önizlemesi</FormLabel>
-                <div className="mt-2 relative w-full aspect-video rounded-md overflow-hidden">
-                  <Image src={imagePreview} alt="Seçilen resmin önizlemesi" fill className="object-cover" />
-                </div>
-              </div>
-            )}
-
             <div className="flex justify-end gap-4">
               <Button
                 type="button"
                 variant="outline"
                 onClick={() => router.back()}
-                disabled={loading || isCompressing || isAiLoading}
+                disabled={loading || isAiLoading}
               >
                 İptal
               </Button>
-              <Button type="submit" disabled={loading || isCompressing || !imageFile || !imagePreview || isAiLoading || isCategoriesLoading || categories.length === 0}>
-                {(loading || isCompressing) && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                {isCompressing ? 'Resim Hazırlanıyor...' : loading ? 'Kaydediliyor...' : 'Kaydet'}
+              <Button type="submit" disabled={loading || isAiLoading || isCategoriesLoading || categories.length === 0}>
+                {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                {loading ? 'Kaydediliyor...' : 'Kaydet'}
               </Button>
             </div>
           </form>
@@ -361,5 +276,3 @@ export default function AddMenuItemPage() {
     </Card>
   );
 }
-
-    
