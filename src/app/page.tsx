@@ -38,7 +38,7 @@ export default function HomePage() {
   const [isClient, setIsClient] = useState(false);
   
   // Set the final domain name directly.
-  const siteUrl = 'https://wafelloqr.com';
+  const siteUrl = 'https://wafelloqrmenu.vercel.app';
 
   useEffect(() => {
     // This effect ensures that client-side APIs are only called after component mount.
@@ -48,7 +48,7 @@ export default function HomePage() {
   const shareData = {
     title: 'Wafello - The Art of Waffles',
     text: 'Check out the most delicious waffles in town!',
-    url: `${siteUrl}/menu`,
+    url: siteUrl,
   };
 
 
@@ -65,7 +65,7 @@ export default function HomePage() {
 
   const handleCopyLink = () => {
     if (typeof window !== 'undefined') {
-        navigator.clipboard.writeText(`${siteUrl}/menu`);
+        navigator.clipboard.writeText(siteUrl);
         toast({
             title: 'Kopyalandı!',
             description: 'Menü linki panoya kopyalandı.',
@@ -74,7 +74,7 @@ export default function HomePage() {
   };
 
   const getSocialShareLink = (platform: SocialPlatform) => {
-    const menuUrl = `${siteUrl}/menu`;
+    const menuUrl = siteUrl;
     const encodedUrl = encodeURIComponent(menuUrl);
     const encodedText = encodeURIComponent(shareData.text);
 
@@ -175,7 +175,7 @@ export default function HomePage() {
                   <div className="p-4 bg-white rounded-lg border">
                     {isClient && (
                       <QRCode
-                        value={`${siteUrl}/menu`}
+                        value={siteUrl}
                         size={160}
                         bgColor="#ffffff"
                         fgColor="#000000"
@@ -258,3 +258,5 @@ export default function HomePage() {
     </div>
   );
 }
+
+    
