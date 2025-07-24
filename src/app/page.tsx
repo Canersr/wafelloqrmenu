@@ -1,3 +1,4 @@
+
 'use client';
 
 import { Button } from '@/components/ui/button';
@@ -30,9 +31,9 @@ import { useState, useEffect } from 'react';
 type SocialPlatform = 'whatsapp' | 'twitter' | 'facebook';
 
 export default function HomePage() {
-  const address = 'Sinan, 1254. Sk. No:18/D, 07170 Muratpaşa/Antalya';
+  const address = 'Sinan, 1254. Sk. No:18/D, Muratpaşa/Antalya';
   const encodedAddress = encodeURIComponent(address);
-  const googleMapsEmbedUrl = `https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3191.206495392769!2d30.70566367683938!3d36.88517596205908!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x14c3913707a2c2b3%3A0x868b7522cfca46e4!2sSinan%2C%201254.%20Sk.%20No%3A18D%2C%2007310%20Muratpa%C5%9Fa%2FAntalya!5e0!3m2!1str!2str!4v1720603700057!5m2!1str!2str`;
+  const googleMapsEmbedUrl = `https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3191.206495392769!2d30.70566367647246!3d36.88517596205908!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x14c3913707a2c2b3%3A0x868b7522cfca46e4!2sWafello!5e0!3m2!1str!2str!4v1721248900000!5m2!1str!2str`;
   const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodedAddress}`;
   const { toast } = useToast();
   const [isClient, setIsClient] = useState(false);
@@ -258,5 +259,3 @@ export default function HomePage() {
     </div>
   );
 }
-
-    
