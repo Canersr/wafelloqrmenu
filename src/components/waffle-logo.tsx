@@ -3,7 +3,7 @@ import type { HTMLAttributes } from 'react';
 import { cn } from '@/lib/utils';
 
 export function WaffleLogo({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
-  const logoUrl = "https://res.cloudinary.com/dxwwviisy/image/upload/v1752132024/wafello_logo-removebg-preview_n1nuzn.png";
+  const logoUrl = "https://res.cloudinary.com/dxwwviisy/image/upload/v1753355292/wafello_logo_ntgqw9.png";
   
   return (
     <div className={cn("relative", className)} {...props}>
