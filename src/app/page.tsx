@@ -40,7 +40,7 @@ export default function HomePage() {
   const [isClient, setIsClient] = useState(false);
   
   // Set the final domain name directly.
-  const siteUrl = 'https://wafelloqrmenu.vercel.app';
+  const siteUrl = 'https://wafello.vercel.app/';
 
   useEffect(() => {
     // This effect ensures that client-side APIs are only called after component mount.
@@ -260,3 +260,5 @@ export default function HomePage() {
     </div>
   );
 }
+
+    
