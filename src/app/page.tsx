@@ -33,6 +33,7 @@ type SocialPlatform = 'whatsapp' | 'twitter' | 'facebook';
 export default function HomePage() {
   const address = 'Sinan, 1254. Sk. No:18/D, Muratpaşa/Antalya';
   const encodedAddress = encodeURIComponent(address);
+  // Daha güvenilir ve işaretçiyi her zaman gösteren koordinat tabanlı embed URL'si
   const googleMapsEmbedUrl = `https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3191.206495392769!2d30.70566367647246!3d36.88517596205908!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x14c3913707a2c2b3%3A0x868b7522cfca46e4!2sWafello!5e0!3m2!1str!2str!4v1721248900000!5m2!1str!2str`;
   const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodedAddress}`;
   const { toast } = useToast();
